@@ -63,6 +63,7 @@ void listarProdutos();
 void removeProduto(int iCodigoProduto);
 void listarFornecedor();
 void listarCliente();
+void listarFuncionario();
 void flush_in();
 
 /* DECLARACAO DE FUNCOES QUE RETORNAM VALOR */
@@ -73,6 +74,7 @@ int menuCadastro();
 int cadastrarProduto();
 int cadastrarFornecedor();
 int cadastrarCliente();
+int cadastrarFuncionario();
 
 
 int main(){
@@ -155,11 +157,11 @@ int menuCadastro(){
         scanf("%d", &iOp);
         switch(iOp){
             case 0: break;
-            case 1: break;
+            case 1: cadastrarFuncionario(); break;
             case 2: cadastrarCliente(); break;
             case 3: cadastrarProduto(); break;
             case 4: cadastrarFornecedor(); break;
-            case 5: break;
+            case 5: listarFuncionario(); break;
             case 6: listarCliente(); break;
             case 7: listarProdutos(); break;
             case 8: listarFornecedor(); break;
@@ -367,7 +369,6 @@ void listarCliente(){
             printf("\nCelular: %s |\tEndereco: %s", cAux->cvCelular, cAux->cvEndereco);
             printf("\n------------------------------------------------------------------------------\n");
             cAux = cAux->cProximo;
-
         }
 
     }
@@ -380,6 +381,7 @@ int cadastrarFuncionario(){
         Funcionario *fNovoFuncionario = (Funcionario *) malloc(sizeof(Funcionario));
         fNovoFuncionario->funProximo = NULL;
         
+        flush_in();
         printf("\nNome: ");
         fgets(fNovoFuncionario->cvNomeFunc, sizeof(fNovoFuncionario->cvNomeFunc), stdin);
         fNovoFuncionario->cvNomeFunc[strcspn(fNovoFuncionario->cvNomeFunc, "\n")] = '\0';
@@ -399,8 +401,8 @@ int cadastrarFuncionario(){
         fgets(fNovoFuncionario->cvTelefone, sizeof(fNovoFuncionario->cvTelefone), stdin);
         fNovoFuncionario->cvTelefone[strcspn(fNovoFuncionario->cvTelefone, "\n")] = '\0';
         printf("\nCelular: ");
-        fgets(fNovoFuncionario->cvEndereco, sizeof(fNovoFuncionario->cvEndereco), stdin);
-        fNovoFuncionario->cvEndereco[strcspn(fNovoFuncionario->cvEndereco, "\n")] = '\0';
+        fgets(fNovoFuncionario->cvCelular, sizeof(fNovoFuncionario->cvCelular), stdin);
+        fNovoFuncionario->cvCelular[strcspn(fNovoFuncionario->cvCelular, "\n")] = '\0';
         printf("\nEndereco: ");
         fgets(fNovoFuncionario->cvEndereco, sizeof(fNovoFuncionario->cvEndereco), stdin);
         fNovoFuncionario->cvEndereco[strcspn(fNovoFuncionario->cvEndereco, "\n")] = '\0';
@@ -418,6 +420,24 @@ int cadastrarFuncionario(){
         cEscolha = escolhaRegistro();
         system("cls || clear");
     }while(cEscolha != 'n');
+}
+
+void listarFuncionario(){
+    printf("\n\t\t\t Listando Funcionarios\n");
+    printf("\n------------------------------------------------------------------------------\n");
+    if(fFuncionarioInicial == NULL){
+        nullList();
+    }else{
+        Funcionario *fAux = fFuncionarioInicial;
+        while(fAux != NULL){
+            printf("\nNome: %s |\tCargo: %s", fAux->cvNomeFunc, fAux->cvCargo);
+            printf("\nCPF: %s |\tData de Nascimento: %s", fAux->cvCpf, fAux->cvData_nascimento);
+            printf("\nEmail: %s |\tTelefone: %s", fAux->cvEmail, fAux->cvTelefone);
+            printf("\nCelular: %s |\tEndereco: %s", fAux->cvCelular, fAux->cvEndereco);
+            printf("\n------------------------------------------------------------------------------\n");
+            fAux = fAux->funProximo;
+        }
+    }
 }
 
 //Limpa buffer do teclado
