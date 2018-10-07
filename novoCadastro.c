@@ -82,6 +82,7 @@ void flush_in();
 /* DECLARACAO DE FUNCOES QUE RETORNAM VALOR */
 int menuPrincipal();
 int menu();
+int menuListar();
 char escolhaRegistro();
 int menuCadastro();
 int cadastrarProduto();
@@ -166,10 +167,7 @@ int menuCadastro(){
         printf("\n2- Cadastrar Cliente");
         printf("\n3- Cadastrar Produto");
         printf("\n4- Cadastrar Fornecedor");
-        printf("\n5- Listar Funcionario");
-        printf("\n6- Listar Clientes");        
-        printf("\n7- Listar Produto");        
-        printf("\n8- Listar Fornecedor");        
+        printf("\n5 - Listar");
         printf("\n\nEntre com a opcao desejada: ");
         scanf("%d", &iOp);
         switch(iOp){
@@ -178,12 +176,28 @@ int menuCadastro(){
             case 2: cadastrarCliente(); break;
             case 3: cadastrarProduto(); break;
             case 4: cadastrarFornecedor(); break;
-            case 5: listarFuncionario(); break;
-            case 6: listarCliente(); break;
-            case 7: listarProdutos(); break;
-            case 8: listarFornecedor(); break;
-
+            case 5: menuListar(); break;
             default: defaultMessage(); break;
+        }
+    }while(iOp != 0);
+}
+
+int menuListar(){
+    int iOp;
+    do{
+        printf("\n0 - Sair");
+        printf("\n1- Listar Funcionario");
+        printf("\n2- Listar Clientes");
+        printf("\n3- Listar Produto");
+        printf("\n4- Listar Fornecedor");
+        printf("\nEntre com a opcao desejada: ");
+        scanf("%d", &iOp);
+        switch(iOp){
+            case 0: break;
+            case 1: listarFuncionario(); break;
+            case 2: listarCliente();break;
+            case 3: listarProdutos();break;
+            case 4: listarFornecedor();break;
         }
     }while(iOp != 0);
 }
@@ -338,7 +352,7 @@ void removeFornecedor(){
         nullDelete();
     }else{
         if(fFornecedorInicial->fProximo == NULL){
-            fFornecedorInicial = NULL
+            fFornecedorInicial = NULL;
         }else{
             Fornecedor *fAux = fFornecedorInicial;
             fFornecedorInicial = fFornecedorInicial->fProximo;
