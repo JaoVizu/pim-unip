@@ -55,6 +55,15 @@ Fornecedor *fFornecedorInicial = NULL;
 Cliente *cClienteInicial = NULL;
 Funcionario *fFuncionarioInicial = NULL;
 
+
+/**
+ * 
+ * AS FUNCOES DE REMOVER ESTAO REMOVENDO SEMPRE O PRIMEIRO ELEMENTO DA LISTA
+ * ACREDITO QUE TEREI QUE ESPERAR PARA VER LISTA DUPLAMENTE ENCADEADA PARA REMOVER
+ * DE ACORDO COM O CODIGO OU NOME
+ * 
+*/
+
 /* DECLARACAO DE  FUNCOES */
 void sair();
 void defaultMessage();
