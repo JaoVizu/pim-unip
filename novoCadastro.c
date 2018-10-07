@@ -59,11 +59,15 @@ Funcionario *fFuncionarioInicial = NULL;
 void sair();
 void defaultMessage();
 void nullList();
+void nullDelete();
 void listarProdutos();
 void removeProduto(int iCodigoProduto);
 void listarFornecedor();
+void removeFornecedor();
 void listarCliente();
+void removeCliente();
 void listarFuncionario();
+void removeFuncionario();
 void flush_in();
 
 /* DECLARACAO DE FUNCOES QUE RETORNAM VALOR */
@@ -92,6 +96,10 @@ void defaultMessage(){
 
 void nullList(){
     printf("\nNao ha registros para serem listados!!!\n");
+}
+
+void nullDelete(){
+    printf("\nNao ha registros para serem removidos!!\n");
 }
 
 char escolhaRegistro(){
@@ -209,6 +217,7 @@ int cadastrarProduto(){
 }
 
 void listarProdutos(){
+    system("cls || clear");
     printf("\n*** Listando Produtos ***\n");
     printf("\n--------------------------------------------------------------------------------\n");
     if(pProdutoInicial == NULL){
@@ -295,6 +304,7 @@ int cadastrarFornecedor(){
 }
 
 void listarFornecedor(){
+    system("cls || clear");
     printf("\nListando Fornecedores");
     printf("\n--------------------------------------------------------------------------------\n");
     if(fFornecedorInicial == NULL){
@@ -308,6 +318,23 @@ void listarFornecedor(){
             printf("\nCelular: %s |\tCodigo Produto: %d", fAux->cvCelular, fAux->iCodigoProduto);
             printf("\n------------------------------------------------------------------------------\n");
             fAux = fAux->fProximo;
+        }
+    }
+}
+
+
+void removeFornecedor(){
+    printf("\n\t\t\tRemover Produto\n");
+    if(fFornecedorInicial == NULL){
+        nullDelete();
+    }else{
+        if(fFornecedorInicial->fProximo == NULL){
+            fFornecedorInicial = NULL
+        }else{
+            Fornecedor *fAux = fFornecedorInicial;
+            fFornecedorInicial = fFornecedorInicial->fProximo;
+            free(fAux);
+            fAux = NULL;
         }
     }
 }
@@ -357,6 +384,7 @@ int cadastrarCliente(){
 }
 
 void listarCliente(){
+    system("cls || clear");
     printf("\n\t\t\tListando Clientes:\n\n");
     printf("\n------------------------------------------------------------------------------\n");
     if(cClienteInicial == NULL){
@@ -371,6 +399,22 @@ void listarCliente(){
             cAux = cAux->cProximo;
         }
 
+    }
+}
+
+void removeCliente(){
+    printf("\n\t\t\tRemovendo Cliente\n");
+    if(cClienteInicial == NULL){
+        nullDelete();
+    }else{
+        if(cClienteInicial->cProximo == NULL){
+            cClienteInicial = NULL;
+        }else{
+            Cliente *cAux = cClienteInicial;
+            cClienteInicial = cClienteInicial->cProximo;
+            free(cAux);
+            cAux = NULL;
+        }
     }
 }
 
@@ -423,6 +467,7 @@ int cadastrarFuncionario(){
 }
 
 void listarFuncionario(){
+    system("cls || clear");
     printf("\n\t\t\t Listando Funcionarios\n");
     printf("\n------------------------------------------------------------------------------\n");
     if(fFuncionarioInicial == NULL){
@@ -436,6 +481,22 @@ void listarFuncionario(){
             printf("\nCelular: %s |\tEndereco: %s", fAux->cvCelular, fAux->cvEndereco);
             printf("\n------------------------------------------------------------------------------\n");
             fAux = fAux->funProximo;
+        }
+    }
+}
+
+void removeFuncionario(){
+    printf("\n\t\t\tRemovendo Funcionario\n");
+    if(fFuncionarioInicial == NULL){
+        nullDelete();
+    }else{
+        if(fFuncionarioInicial->funProximo == NULL){
+            fFuncionarioInicial = NULL;
+        }else{
+            Funcionario *fAux = fFuncionarioInicial;
+            fFuncionarioInicial = fFuncionarioInicial->funProximo;
+            free(fAux);
+            fAux = NULL;
         }
     }
 }
