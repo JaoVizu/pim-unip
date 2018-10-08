@@ -122,10 +122,10 @@ char escolhaRegistro(){
 int menuPrincipal()
 {
     int iOp;
-    printf("**Menu**\n\n");
-    printf(" 1-> Cadastro\n");
-    printf(" 2-> Caixa\n");
-    printf(" 3-> Estoque\n");
+    printf("\n\t\t\tMenu\n");
+    printf(" 1- Cadastro\n");
+    printf(" 2- Caixa\n");
+    printf(" 3- Estoque\n");
     printf("\n Escolha a opcao desejada: ");
     scanf("%d", &iOp);
     return iOp;
@@ -159,9 +159,8 @@ int menu()
 
 int menuCadastro(){
     int iOp;
-
     do{
-        printf("\n *** MENU CADASTRO ***");
+        printf("\n\t\t\tMENU CADASTRO\n");
         printf("\n0- sair");
         printf("\n1- Cadastrar Funcionario");
         printf("\n2- Cadastrar Cliente");
@@ -183,8 +182,10 @@ int menuCadastro(){
 }
 
 int menuListar(){
+    system("cls || clear");
     int iOp;
     do{
+        printf("\n\t\t\tListar\n");
         printf("\n0 - Sair");
         printf("\n1- Listar Funcionario");
         printf("\n2- Listar Clientes");
@@ -193,7 +194,7 @@ int menuListar(){
         printf("\nEntre com a opcao desejada: ");
         scanf("%d", &iOp);
         switch(iOp){
-            case 0: break;
+            case 0: system("cls || clear");break;
             case 1: listarFuncionario(); break;
             case 2: listarCliente();break;
             case 3: listarProdutos();break;
@@ -203,7 +204,8 @@ int menuListar(){
 }
 
 int cadastrarProduto(){
-    printf("\n** Cadastro de produtos **\n");
+    system("cls || clear");
+    printf("\n\t\t\tCadastro de produtos\n");
     char cEscolha;
     do{
         Produto *pNovoProduto = (Produto*) malloc(sizeof(Produto));
@@ -241,7 +243,7 @@ int cadastrarProduto(){
 
 void listarProdutos(){
     system("cls || clear");
-    printf("\n*** Listando Produtos ***\n");
+    printf("\n\t\t\tListando Produtos\n");
     printf("\n--------------------------------------------------------------------------------\n");
     if(pProdutoInicial == NULL){
          nullList();
@@ -270,7 +272,7 @@ void removeProduto(int iCodigoProduto)
             pProdutoInicial = NULL;
         }
         else
-        {
+        {   
             Produto *pAux = pProdutoInicial;
             pProdutoInicial = pProdutoInicial->pProximo;
             free(pAux);
@@ -280,8 +282,9 @@ void removeProduto(int iCodigoProduto)
 }
 
 int cadastrarFornecedor(){
+    system("cls || clear");
     char cEscolha;
-    printf("\nCadastro de Fornecedor");
+    printf("\n\t\t\tCadastro de Fornecedor\n");
     do{
         Fornecedor *novoFornecedor = (Fornecedor*) malloc(sizeof(Fornecedor));
         novoFornecedor->fProximo = NULL;
@@ -328,7 +331,7 @@ int cadastrarFornecedor(){
 
 void listarFornecedor(){
     system("cls || clear");
-    printf("\nListando Fornecedores");
+    printf("\n\t\t\tListando Fornecedores\n");
     printf("\n--------------------------------------------------------------------------------\n");
     if(fFornecedorInicial == NULL){
         nullList();
@@ -363,8 +366,9 @@ void removeFornecedor(){
 }
 
 int cadastrarCliente(){
+    system("cls || clear");
     char cEscolha;
-    printf("\nCadastro de Cliente\n");
+    printf("\n\t\t\tCadastro de Cliente\n");
     do{
         Cliente *cNovocliente = (Cliente*) malloc(sizeof(Cliente));
         cNovocliente->cProximo = NULL;
@@ -442,6 +446,7 @@ void removeCliente(){
 }
 
 int cadastrarFuncionario(){
+    system("cls || clear");
     char cEscolha;
     printf("\n\t\t\tCadastro de Funcionario\n");
     do{
