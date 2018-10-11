@@ -464,33 +464,6 @@ int alteraProduto()
         }
         pAux = pAux->pProximo;
     }
-
-   /*if (pAux == NULL)
-    {
-        printf("\nNao existe!!");
-    }
-    else
-    {
-        flush_in();
-        printf("\nNome do produto: ");
-        fgets(pAux->cvNome, sizeof(pAux->cvNome), stdin);
-        pAux->cvNome[strcspn(pAux->cvNome, "\n")] = '\0';
-        strcpy(pAux->cvNome, pAux->cvNome);
-        printf("\nData de Validade: ");
-        fgets(pAux->cvValidade, sizeof(pAux->cvValidade), stdin);
-        pAux->cvValidade[strcspn(pAux->cvValidade, "\n")] = '\0';
-        strcpy(pAux->cvValidade, pAux->cvValidade);
-        printf("\nValor do Produto: ");
-        scanf("%f", &pAux->fValor);
-        pAux->fValor = pAux->fValor;
-        printf("\nCodigo do Produto: ");
-        scanf("%d", &pAux->iCodigo);
-        pAux->iCodigo = pAux->iCodigo;
-        printf("\nCodigo do Fornecedor: ");
-        scanf("%d", &pAux->iCodigoFornecedor);
-        pAux->iCodigoFornecedor = pAux->iCodigoFornecedor;
-        pAux->pProximo = pAux->pProximo;
-    }*/
     
 }
 
@@ -525,24 +498,25 @@ void removeProduto()
     }
     else
     {
-        char *cvExNome;
+        Produto *pAux = pProdutoInicial;
+        Produto *pPrev;
+        char cvExNome[201];
         flush_in();
         printf("Entre com o nome do produto a ser **REMOVIDO**");
         fgets(cvExNome, sizeof(cvExNome), stdin);
         cvExNome[strcspn(cvExNome, "\n")] = '\0';
 
-        Produto *pAux = pProdutoInicial;
-        Produto *pPrev;
         while (pAux != NULL)
         {
             pPrev = pAux;
-            pAux = pAux->pProximo;
-            if (pAux && strcmp(pAux->cvNome, cvExNome) == 0)
+            if (strcmp(pAux->cvNome, cvExNome) == 0)
             {
                 pPrev->pProximo = pAux->pProximo;
+                pAux = pAux->pProximo;
                 free(pAux);
                 pAux = NULL;
             }
+            pAux = pAux->pProximo;
         }
     }
 }

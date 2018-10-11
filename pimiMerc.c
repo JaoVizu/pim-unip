@@ -210,6 +210,132 @@ int menuListar(){
         }
     }while(iOp != 0);
 }
+void tela(char tela[])
+{
+    printf("================================================================================================================================================================================================================================================");
+    printf("\t2vjmig\n\n");
+    printf("\t\t\t\t\t%s\n", tela);
+    printf("\n\t\t\t\t\t\t\t\t\t\t\t\t\t\tiMerc.vs2018\n");
+    printf("================================================================================================================================================================================================================================================\n");
+}
+
+void CadastroLogin(char cvCadastroLogin[], char cvCadastroSenha[])
+{
+    char cCaracter;
+    char cvSenhaIgual[07];
+    int iQtdCaracter;
+    int iSenhaIgual = 0;
+    do
+    {
+        printf("\nDigite o login: ");
+        fflush(stdin); //Limpando o buffer do teclado
+        gets(cvCadastroLogin);
+        printf("\nDigite a senha: ");
+        iQtdCaracter = 0;
+        do
+        {
+            cCaracter = getch();
+            if (isprint(cCaracter) && (iQtdCaracter != 6))
+            {                                              //Analisa se o valor da variï¿½vel c ï¿½ imprimivel
+                cvCadastroSenha[iQtdCaracter] = cCaracter; //Se for, armazena o caractere
+                iQtdCaracter++;
+                printf("*"); //imprime o * Anterisco
+            }
+            else if (cCaracter == 8 && iQtdCaracter)
+            { //8 ï¿½ o caractere BackSpace na tabela ASCII, && a analisa se a ï¿½ diferente de 0
+                cvCadastroSenha[iQtdCaracter] = '\0';
+                iQtdCaracter--;
+                printf("\b \b"); //Apagando o caractere digitado
+            }
+        } while (cCaracter != 13); //13 ï¿½ o valor de ENTER na tabela ASCII
+        cvCadastroSenha[iQtdCaracter] = '\0';
+
+        printf("\nConfirmacao da senha: ");
+        iQtdCaracter = 0;
+        do
+        {
+            cCaracter = getch();
+            if (isprint(cCaracter) && (iQtdCaracter != 6))
+            { //Analisa se o valor de c ï¿½ imprimï¿½vel
+                cvSenhaIgual[iQtdCaracter] = cCaracter;
+                iQtdCaracter++;
+                printf("*"); //Imprimindo apenas o asterisco *
+            }
+            else if (cCaracter == 8 && iQtdCaracter)
+            {
+                cvSenhaIgual[iQtdCaracter] = '\0';
+                iQtdCaracter--;
+                printf("\b \b"); //Apagando os caracteres digitados
+            }
+        } while (cCaracter != 13); //13 ï¿½ o valor de ENTER na tabela ASCII
+        cvSenhaIgual[iQtdCaracter] = '\0';
+
+        if (!strcmp(cvCadastroSenha, cvSenhaIgual))
+        {
+            //strcmp retorna 0 se as variï¿½veis forem iguais. !strcmp ï¿½ o mesmo que strcmp==0
+            printf("\n\n\t\t\tCADASTRO EFETUADO COM SUCESSO...\n\n");
+            iSenhaIgual = 1;
+            system("cls || clear");
+        }
+        else
+        {
+            system("cls||clear");
+            printf("\n\n\t\a\tSENHAS DIFERENTES - DIGITE NOVAMENTE...\n\n");
+        }
+    } while (iSenhaIgual != 1); //Enquanto b e d forem diferente de zero 0
+}
+
+void VerificarLogin()
+{
+    char cCaracter;
+    char cvAcessoLogin[50];
+    char cvAcessoSenha[07];
+    int iQtdCaracter;
+    int iSenhaIgual = 0;
+    do
+    {
+        printf("\nEntre com o login: ");
+        fflush(stdin); //Limpando o buffer do teclado
+        gets(cvAcessoLogin);
+        printf("\nEntre com a senha: ");
+        iQtdCaracter = 0;
+        do
+        {
+            cCaracter = getch();
+            if (isprint(cCaracter) && (iQtdCaracter != 6))
+            { //Analisa se o valor de c ï¿½ imprimï¿½vel
+                cvAcessoSenha[iQtdCaracter] = cCaracter;
+                iQtdCaracter++;
+                printf("*"); //Imprimindo apenas o asterisco *
+            }
+            else if (cCaracter == 8 && iQtdCaracter)
+            {
+                cvAcessoSenha[iQtdCaracter] = '\0';
+                iQtdCaracter--;
+                printf("\b \b"); //Apagando os caracteres digitados
+            }
+        } while (cCaracter != 13); //13 ï¿½ o valor de ENTER na tabela ASCII
+        cvAcessoSenha[iQtdCaracter] = '\0';
+
+        Funcionario *fAux = fFuncionarioInicial;
+        while (fAux != NULL)
+        {
+            if( (!strcmp(fAux->cvLogin, cvAcessoLogin)) && (!strcmp(fAux->cvSenha,cvAcessoSenha))){
+                //printf("\n\n\t\t\tLOGADO COM SUCESSO...\n\n");
+                printf("\n\n\t\t\tBEM-VINDO %s... \n", fAux->cvNomeFunc);
+                printf("\tt\t\tVoce esta operando como: %s \n\n", fAux->cvCargo);
+                iSenhaIgual = 1;
+                menu();
+            }
+            fAux = fAux->funProximo;
+        }
+        
+        if(iSenhaIgual == 0){
+        	printf("\n\nUsuario nao cadastrado... Tente Novamente! \n\n");
+		}
+	
+    } while (iSenhaIgual != 1);
+}
 
 int cadastrarProduto(){
     system("cls || clear");
@@ -266,122 +392,48 @@ void listarProdutos(){
     }
 }
 
-void tela(char tela[]){
-printf("================================================================================================================================================================================================================================================");
-		printf("\t2vjmig\n\n");
-		printf("\t\t\t\t\t%s\n",tela);
-		printf("\n\t\t\t\t\t\t\t\t\t\t\t\t\t\tiMerc.vs2018\n");
-		printf("================================================================================================================================================================================================================================================\n");
+int alteraProduto()
+{
+    Produto *pAux = pProdutoInicial;
+    char cvBNome[201];
+    flush_in();
+    printf("\nEntre com o nome do produto a ser alterado: ");
+    fgets(cvBNome, sizeof(cvBNome), stdin);
+    cvBNome[strcspn(cvBNome, "\n")] = '\0';
+    //controle para ver se o produto esta cadastrado ou nao
+    int iNaoEncontrado = 0;
+    while (pAux != NULL)
+    {
+        if (!strcmp(pAux->cvNome, cvBNome))
+        {
+            flush_in();
+            printf("\nNome do produto: ");
+            fgets(pAux->cvNome, sizeof(pAux->cvNome), stdin);
+            pAux->cvNome[strcspn(pAux->cvNome, "\n")] = '\0';
+            strcpy(pAux->cvNome, pAux->cvNome);
+            printf("\nData de Validade: ");
+            fgets(pAux->cvValidade, sizeof(pAux->cvValidade), stdin);
+            pAux->cvValidade[strcspn(pAux->cvValidade, "\n")] = '\0';
+            strcpy(pAux->cvValidade, pAux->cvValidade);
+            printf("\nValor do Produto: ");
+            scanf("%f", &pAux->fValor);
+            pAux->fValor = pAux->fValor;
+            printf("\nCodigo do Produto: ");
+            scanf("%d", &pAux->iCodigo);
+            pAux->iCodigo = pAux->iCodigo;
+            printf("\nCodigo do Fornecedor: ");
+            scanf("%d", &pAux->iCodigoFornecedor);
+            pAux->iCodigoFornecedor = pAux->iCodigoFornecedor;
+            iNaoEncontrado++;
+        }
+        pAux = pAux->pProximo;
+    }
+
+    if(iNaoEncontrado == 0){
+        nullList();
+    }
 }
 
-void CadastroLogin(char cvCadastroLogin[],char cvCadastroSenha[]){
-       char cCaracter;
-	   char cvSenhaIgual[07];
-       int iQtdCaracter;
-	   int iSenhaIgual=0;
-	   do{
-       printf("\nDigite o login: ");
-       fflush(stdin);                     //Limpando o buffer do teclado
-       gets(cvCadastroLogin);
-       printf("\nDigite a senha: ");
-       iQtdCaracter=0;
-       do{
-           cCaracter=getch();
-           if(isprint(cCaracter)&&(iQtdCaracter!=6)){       //Analisa se o valor da variável c é imprimivel
-           cvCadastroSenha[iQtdCaracter]=cCaracter;  //Se for, armazena o caractere
-           iQtdCaracter++;
-           printf("*");          //imprime o * Anterisco
-           }
-           else if(cCaracter==8 && iQtdCaracter){     //8 é o caractere BackSpace na tabela ASCII, && a analisa se a é diferente de 0
-           cvCadastroSenha[iQtdCaracter]='\0';
-           iQtdCaracter--;
-           printf("\b \b");       //Apagando o caractere digitado
-           }
-       }while(cCaracter!=13);             //13 é o valor de ENTER na tabela ASCII
-       cvCadastroSenha[iQtdCaracter]='\0';
-       
-           printf("\nconfirmação da senha: ");
-           iQtdCaracter=0;
-               do{
-                   cCaracter=getch();
-                   if(isprint(cCaracter)&&(iQtdCaracter!=6)){      //Analisa se o valor de c é imprimível
-                   cvSenhaIgual[iQtdCaracter]=cCaracter;
-                   iQtdCaracter++;
-                   printf("*");      //Imprimindo apenas o asterisco *
-                   }
-                   else if(cCaracter==8 && iQtdCaracter){
-                   cvSenhaIgual[iQtdCaracter]='\0';
-                   iQtdCaracter--;
-                   printf("\b \b");     //Apagando os caracteres digitados
-                   }
-               }while(cCaracter!=13);           //13 é o valor de ENTER na tabela ASCII
-               cvSenhaIgual[iQtdCaracter]='\0';
-
-               if(!strcmp(cvCadastroSenha,cvSenhaIgual)){
-               //strcmp retorna 0 se as variáveis forem iguais. !strcmp é o mesmo que strcmp==0
-               printf("\n\n\t\t\tCADASTRO EFETUADO COM SUCESSO...\n\n");
-               iSenhaIgual=1;
-               system("cls || clear");
-               }
-               else {
-               	system("cls||clear");
-                printf("\n\n\t\a\tSENHAS DIFERENTES - DIGITE NOVAMENTE...\n\n");
-               }
-       }while(iSenhaIgual!=1);                      //Enquanto b e d forem diferente de zero 0
-}
-    
-void VerificarLogin(){
-       char cCaracter;
-	   char cvAcessoLogin[50];
-	   char cvAcessoSenha[07];
-       int iQtdCaracter;
-	   int iSenhaIgual;
-       do{
-           printf("\nEntre com o login: ");
-           fflush(stdin);      //Limpando o buffer do teclado
-           gets(cvAcessoLogin);
-           printf("\nEntre com a senha: ");
-           iQtdCaracter=0;
-               do{
-                   cCaracter=getch();
-                   if(isprint(cCaracter)&&(iQtdCaracter!=6)){      //Analisa se o valor de c é imprimível
-                   cvAcessoSenha[iQtdCaracter]=cCaracter;
-                   iQtdCaracter++;
-                   printf("*");      //Imprimindo apenas o asterisco *
-                   }
-                   else if(cCaracter==8 && iQtdCaracter){
-                   cvAcessoSenha[iQtdCaracter]='\0';
-                   iQtdCaracter--;
-                   printf("\b \b");     //Apagando os caracteres digitados
-                   }
-               }while(cCaracter!=13);           //13 é o valor de ENTER na tabela ASCII
-               cvAcessoSenha[iQtdCaracter]='\0';
-
-               /*if(!strcmp(cvCadastroLogin,cvAcessoLogin)&&!strcmp(cvCadastroSenha,cvAcessoSenha)){
-               //strcmp retorna 0 se as variáveis forem iguais. !strcmp é o mesmo que strcmp==0
-               printf("\n\n\t\t\tLOGADO COM SUCESSO...\n\n");
-               iSenhaIgual=1;
-               menu();
-               }*/
-               
-               Funcionario *fAux = fFuncionarioInicial;
-               while(fAux != NULL && !strcmp(fAux, cvAcessoLogin) && !strcmp(fAux, cvAcessoSenha)){
-            		fAux = fAux->funProximo;
-			   }
-			   
-				if(!fAux == NULL){
-				printf("\n\n\t\t\tLOGADO COM SUCESSO...\n\n");
-               	iSenhaIgual=1;
-               	menu();
-			   }
-			   
-               else {
-               system("cls || clear");
-                printf("\n\n\t\a\tSENHA ou LOGIN INVALIDO - TENTE NOVAMENTE...\n\n");
-               }
-       }while(iSenhaIgual!=1);
-}
-	    
 void removeProduto(int iCodigoProduto)
 {
     printf("\nRemover produto");
