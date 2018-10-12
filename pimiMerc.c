@@ -69,15 +69,19 @@ int iAdm = 0;
 /* DECLARACAO DE  FUNCOES */
 void sair();
 void defaultMessage();
+void editMessage(char cvFunction[]);
 void nullList();
 void nullDelete();
 void listarProdutos();
 void removeProduto(int iCodigoProduto);
 void listarFornecedor();
+void alteraFornecedor();
 void removeFornecedor();
 void listarCliente();
+void alteraCliente();
 void removeCliente();
 void listarFuncionario();
+void alteraFuncionario();
 void removeFuncionario();
 void flush_in();
 void CadastroLogin(char cvCadastroLogin[],char cvCadastroSenha[]);
@@ -88,6 +92,7 @@ void tela(char tela[]);
 int menuPrincipal();
 int menu();
 int menuListar();
+int menuAlterar();
 char escolhaRegistro();
 int menuCadastro();
 int cadastrarProduto();
@@ -109,6 +114,10 @@ void defaultMessage(){
     printf("\nPor favor, entre com uma opcao valida!\n");
 }
 
+void editMessage(char cvFunction[]){
+    printf("\nEntre com o nome do %s a ser alterado: ", cvFunction);
+}
+
 void nullList(){
     printf("\nNao ha registros para serem listados!!!\n");
 }
@@ -126,10 +135,11 @@ char escolhaRegistro(){
 
 int menuPrincipal()
 {
+	
     int iOp;
     printf("\n\t\t\tMenu\n");
     printf(" 0- Fazer Logof\n");
-    printf(" 1- Cadastro Funcionario\n");
+    printf(" 1- Cadastros\n");
     printf(" 2- Caixa\n");
     printf(" 3- Estoque\n");
     printf("\n Escolha a opcao desejada: ");
@@ -165,9 +175,12 @@ int menu()
     } while (iOp != 0);
 }
 
-int menuCadastro(){
+int menuCadastro()
+{
+	system("cls || clear");
     int iOp;
-    do{
+    do
+    {
         printf("\n\t\t\tMENU CADASTRO\n");
         printf("\n0- sair");
         printf("\n1- Cadastrar Funcionario");
@@ -175,18 +188,40 @@ int menuCadastro(){
         printf("\n3- Cadastrar Produto");
         printf("\n4- Cadastrar Fornecedor");
         printf("\n5 - Listar");
+        printf("\n6 - Alterar");
+        printf("\n7 - excluir");
         printf("\n\nEntre com a opcao desejada: ");
         scanf("%d", &iOp);
-        switch(iOp){
-            case 0: break;
-            case 1: cadastrarFuncionario(); break;
-            case 2: cadastrarCliente(); break;
-            case 3: cadastrarProduto(); break;
-            case 4: cadastrarFornecedor(); break;
-            case 5: menuListar(); break;
-            default: defaultMessage(); break;
+        switch (iOp)
+        {
+        case 0:
+            break;
+        case 1:
+            cadastrarFuncionario();
+            break;
+        case 2:
+            cadastrarCliente();
+            break;
+        case 3:
+            cadastrarProduto();
+            break;
+        case 4:
+            cadastrarFornecedor();
+            break;
+        case 5:
+            menuListar();
+            break;
+        case 6:
+            menuAlterar();
+            break;
+        case 7:
+            //removeProduto();
+            break;
+        default:
+            defaultMessage();
+            break;
         }
-    }while(iOp != 0);
+    } while (iOp != 0);
 }
 
 int menuListar(){
@@ -210,6 +245,47 @@ int menuListar(){
         }
     }while(iOp != 0);
 }
+
+int menuAlterar()
+{
+    system("cls || clear");
+    int iOp;
+    do
+    {
+        printf("\n\t\t\Alterar\n");
+        printf("\n0 - Sair");
+        printf("\n1- Alterar Funcionario");
+        printf("\n2- Alterar Clientes");
+        printf("\n3- Alterar Produto");
+        printf("\n4- Alterar Fornecedor");
+        printf("\nEntre com a opcao desejada: ");
+        scanf("%d", &iOp);
+        switch (iOp)
+        {
+        case 0:
+            menuCadastro();
+            break;
+        case 1:
+            alteraFuncionario();
+            break;
+        case 2:
+            alteraCliente();
+            break;
+        case 3:
+            alteraProduto();
+            break;
+        case 4:
+            alteraFornecedor();
+            break;
+
+        default:
+            defaultMessage();
+            break;
+        }
+
+    } while (iOp < 0 || iOp > 3);
+}
+
 void tela(char tela[])
 {
     printf("================================================================================================================================================================================================================================================");
@@ -322,8 +398,9 @@ void VerificarLogin()
         {
             if( (!strcmp(fAux->cvLogin, cvAcessoLogin)) && (!strcmp(fAux->cvSenha,cvAcessoSenha))){
                 //printf("\n\n\t\t\tLOGADO COM SUCESSO...\n\n");
+                system("cls || clear");
                 printf("\n\n\t\t\tBEM-VINDO %s... \n", fAux->cvNomeFunc);
-                printf("\tt\t\tVoce esta operando como: %s \n\n", fAux->cvCargo);
+                printf("\t\t\tVoce esta operando como: %s \n\n", fAux->cvCargo);
                 iSenhaIgual = 1;
                 menu();
             }
@@ -331,7 +408,7 @@ void VerificarLogin()
         }
         
         if(iSenhaIgual == 0){
-        	printf("\n\nUsuario nao cadastrado... Tente Novamente! \n\n");
+        	printf("\n\n\t\t\tUsuario nao cadastrado... Tente Novamente! \n\n");
 		}
 	
     } while (iSenhaIgual != 1);
@@ -395,13 +472,12 @@ void listarProdutos(){
 int alteraProduto()
 {
     Produto *pAux = pProdutoInicial;
+    int iNaoEncontrado = 0;
     char cvBNome[201];
     flush_in();
     printf("\nEntre com o nome do produto a ser alterado: ");
     fgets(cvBNome, sizeof(cvBNome), stdin);
     cvBNome[strcspn(cvBNome, "\n")] = '\0';
-    //controle para ver se o produto esta cadastrado ou nao
-    int iNaoEncontrado = 0;
     while (pAux != NULL)
     {
         if (!strcmp(pAux->cvNome, cvBNome))
@@ -425,11 +501,12 @@ int alteraProduto()
             scanf("%d", &pAux->iCodigoFornecedor);
             pAux->iCodigoFornecedor = pAux->iCodigoFornecedor;
             iNaoEncontrado++;
+            break;
         }
         pAux = pAux->pProximo;
     }
-
-    if(iNaoEncontrado == 0){
+    if (iNaoEncontrado == 0)
+    {
         nullList();
     }
 }
@@ -524,6 +601,55 @@ void listarFornecedor(){
     }
 }
 
+void alteraFornecedor()
+{
+
+    Fornecedor *fAux = fFornecedorInicial;
+    char cvExNome[201];
+    flush_in();
+    editMessage("fornecedor");
+    fgets(cvExNome, sizeof(cvExNome), stdin);
+    cvExNome[strcspn(cvExNome, "\n")] = '\0';
+    int iNaoEncontrado = 0;
+    while (fAux != NULL)
+    {
+        if (!strcmp(fAux->cvNome, cvExNome) || !strcmp(fAux->cvNomeFantasia, cvExNome))
+        {
+            flush_in();
+            printf("\nNome do Fornecedor: ");
+            fgets(fAux->cvNome, sizeof(fAux->cvNome), stdin);
+            fAux->cvNome[strcspn(fAux->cvNome, "\n")] = '\0';
+            printf("\nNome Fantasia: ");
+            fgets(fAux->cvNomeFantasia, sizeof(fAux->cvNomeFantasia), stdin);
+            fAux->cvNomeFantasia[strcspn(fAux->cvNomeFantasia, "\n")] = '\0';
+            printf("\nEndereco: ");
+            fgets(fAux->cvEndereco, sizeof(fAux->cvEndereco), stdin);
+            fAux->cvEndereco[strcspn(fAux->cvEndereco, "\n")] = '\0';
+            printf("\CNPJ: ");
+            fgets(fAux->cvCnpj, sizeof(fAux->cvCnpj), stdin);
+            fAux->cvCnpj[strcspn(fAux->cvCnpj, "\n")] = '\0';
+            printf("\nEmail: ");
+            fgets(fAux->cvEmail, sizeof(fAux->cvEmail), stdin);
+            fAux->cvEmail[strcspn(fAux->cvEmail, "\n")] = '\0';
+            printf("\nTelefone: ");
+            fgets(fAux->cvTelefone, sizeof(fAux->cvTelefone), stdin);
+            fAux->cvTelefone[strcspn(fAux->cvTelefone, "\n")] = '\0';
+            printf("\nCelular: ");
+            fgets(fAux->cvCelular, sizeof(fAux->cvCelular), stdin);
+            fAux->cvCelular[strcspn(fAux->cvCelular, "\n")] = '\0';
+            printf("\nCodigo Produto: ");
+            scanf("%d", &fAux->iCodigoProduto);
+            iNaoEncontrado++;
+            break;
+        }
+        fAux = fAux->fProximo;
+    }
+
+    if (iNaoEncontrado == 0)
+    {
+        nullList();
+    }
+}
 
 void removeFornecedor(){
     printf("\n\t\t\tRemover Produto\n");
@@ -605,6 +731,53 @@ void listarCliente(){
     }
 }
 
+void alteraCliente()
+{
+    Cliente *cAux = cClienteInicial;
+    char cvExNome[201];
+    flush_in();
+    editMessage("cliente");
+    fgets(cvExNome, sizeof(cvExNome), stdin);
+    cvExNome[strcspn(cvExNome, "\n")] = '\0';
+    int iNaoEncontrado = 0;
+    while (cAux != NULL)
+    {
+        if (!strcmp(cAux->cvNomeCli, cvExNome))
+        {
+            flush_in();
+            printf("\nNome: ");
+            fgets(cAux->cvNomeCli, sizeof(cAux->cvNomeCli), stdin);
+            cAux->cvNomeCli[strcspn(cAux->cvNomeCli, "\n")] = '\0';
+            printf("\nCPF: ");
+            fgets(cAux->cvCpf, sizeof(cAux->cvCpf), stdin);
+            cAux->cvCpf[strcspn(cAux->cvCpf, "\n")] = '\0';
+            printf("\nData de Nascimento: ");
+            fgets(cAux->cvData_nascimento, sizeof(cAux->cvData_nascimento), stdin);
+            cAux->cvData_nascimento[strcspn(cAux->cvData_nascimento, "\n")] = '\0';
+            printf("\nEmail: ");
+            fgets(cAux->cvEmail, sizeof(cAux->cvEmail), stdin);
+            cAux->cvEmail[strcspn(cAux->cvEmail, "\n")] = '\0';
+            printf("\nTelefone: ");
+            fgets(cAux->cvTelefone, sizeof(cAux->cvTelefone), stdin);
+            cAux->cvTelefone[strcspn(cAux->cvTelefone, "\n")] = '\0';
+            printf("\nCelular: ");
+            fgets(cAux->cvCelular, sizeof(cAux->cvCelular), stdin);
+            cAux->cvCelular[strcspn(cAux->cvCelular, "\n")] = '\0';
+            printf("\nEndereco: ");
+            fgets(cAux->cvEndereco, sizeof(cAux->cvEndereco), stdin);
+            cAux->cvEndereco[strcspn(cAux->cvEndereco, "\n")] = '\0';
+            iNaoEncontrado++;
+            break;
+        }
+        cAux = cAux->cProximo;
+    }
+
+    if (iNaoEncontrado == 0)
+    {
+        nullList();
+    }
+}
+
 void removeCliente(){
     printf("\n\t\t\tRemovendo Cliente\n");
     if(cClienteInicial == NULL){
@@ -634,6 +807,7 @@ int cadastrarFuncionario(){
         printf("\nNome: ");
         fgets(fNovoFuncionario->cvNomeFunc, sizeof(fNovoFuncionario->cvNomeFunc), stdin);
         fNovoFuncionario->cvNomeFunc[strcspn(fNovoFuncionario->cvNomeFunc, "\n")] = '\0';
+        strcpy(fNovoFuncionario->cvCargo, "GERENTE");
 		CadastroLogin(fNovoFuncionario->cvLogin, fNovoFuncionario->cvSenha);
 
         if(fFuncionarioInicial == NULL) {
@@ -672,8 +846,9 @@ int cadastrarFuncionario(){
 			    		fNovoFuncionario->cvCargo[strcspn(fNovoFuncionario->cvCargo, "\n")] = '\0';
 					break;	
 			    default:
-				printf("\nOpcao invalida");
-				 fflush(stdin);
+				    printf("\nOpcao invalida");
+				    fflush(stdin);
+                break;
 			}
 		}while((op<1) || (op>3));
 			fflush(stdin);
@@ -729,6 +904,78 @@ void listarFuncionario(){
             printf("\n------------------------------------------------------------------------------\n");
             fAux = fAux->funProximo;
         }
+    }
+}
+
+void alteraFuncionario()
+{
+    Funcionario *fAux = fFuncionarioInicial;
+    int iOp;
+    char cvExNome[201];
+    flush_in();
+    editMessage("funcionario");
+    fgets(cvExNome, sizeof(cvExNome), stdin);
+    cvExNome[strcspn(cvExNome, "\n")] = '\0';
+    int iNaoEncontrado = 0;
+    while (fAux != NULL)
+    {
+        if (!strcmp(fAux->cvNomeFunc, cvExNome))
+        {
+            flush_in();
+            printf("\nNome funcionario: ");
+            fgets(fAux->cvNomeFunc, sizeof(fAux->cvNomeFunc), stdin);
+            fAux->cvNomeFunc[strcspn(fAux->cvNomeFunc, "\n")] = '\0';
+            do
+            {
+                printf("\nCargo: ");
+                printf("\n1: GERENTE \n2: CAIXA \n3: FINANCEIRO\n");
+                scanf("%d", &iOp);
+                switch (iOp)
+                {
+                case 1:
+                    strcpy(fAux->cvCargo, "GERENTE");
+                    fAux->cvCargo[strcspn(fAux->cvCargo, "\n")] = '\0';
+                    break;
+                case 2:
+                    strcpy(fAux->cvCargo, "CAIXA");
+                    fAux->cvCargo[strcspn(fAux->cvCargo, "\n")] = '\0';
+                    break;
+                case 3:
+                    strcpy(fAux->cvCargo, "FINANCEIRO");
+                    fAux->cvCargo[strcspn(fAux->cvCargo, "\n")] = '\0';
+                    break;
+                default:
+                    printf("\nOpcao invalida");
+                    fflush(stdin);
+                    break;
+                }
+            } while ((iOp < 1) || (iOp > 3));
+            printf("\nCPF: ");
+            fgets(fAux->cvCpf, sizeof(fAux->cvCpf), stdin);
+            fAux->cvCpf[strcspn(fAux->cvCpf, "\n")] = '\0';
+            printf("\nData de Nascimento: ");
+            fgets(fAux->cvData_nascimento, sizeof(fAux->cvData_nascimento), stdin);
+            fAux->cvData_nascimento[strcspn(fAux->cvData_nascimento, "\n")] = '\0';
+            printf("\nEmail: ");
+            fgets(fAux->cvEmail, sizeof(fAux->cvEmail), stdin);
+            fAux->cvEmail[strcspn(fAux->cvEmail, "\n")] = '\0';
+            printf("\nTelefone: ");
+            fgets(fAux->cvTelefone, sizeof(fAux->cvTelefone), stdin);
+            fAux->cvTelefone[strcspn(fAux->cvTelefone, "\n")] = '\0';
+            printf("\nCelular: ");
+            fgets(fAux->cvCelular, sizeof(fAux->cvCelular), stdin);
+            fAux->cvCelular[strcspn(fAux->cvCelular, "\n")] = '\0';
+            printf("\nEndereco: ");
+            fgets(fAux->cvEndereco, sizeof(fAux->cvEndereco), stdin);
+            fAux->cvEndereco[strcspn(fAux->cvEndereco, "\n")] = '\0';
+            iNaoEncontrado++;
+            break;
+        }
+        fAux = fAux->funProximo;
+    }
+    if (iNaoEncontrado == 0)
+    {
+        nullList();
     }
 }
 
