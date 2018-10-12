@@ -956,7 +956,28 @@ int cadastrarFuncionario(){
         }
         system("cls || clear");
         iAdm=1;
-        //printf("%d",iAdm);
+        printf("\n\t\t\tContinuar cadastro...\n");
+        fflush(stdin);
+        printf("\nCPF: ");
+        fgets(fNovoFuncionario->cvCpf, sizeof(fNovoFuncionario->cvCpf), stdin);
+        fNovoFuncionario->cvCpf[strcspn(fNovoFuncionario->cvCpf, "\n")] = '\0';
+        printf("\nData de Nascimento: ");
+        fgets(fNovoFuncionario->cvData_nascimento, sizeof(fNovoFuncionario->cvData_nascimento), stdin);
+        fNovoFuncionario->cvData_nascimento[strcspn(fNovoFuncionario->cvData_nascimento, "\n")] = '\0';
+        printf("\nEmail: ");
+        fgets(fNovoFuncionario->cvEmail, sizeof(fNovoFuncionario->cvEmail), stdin);
+        fNovoFuncionario->cvEmail[strcspn(fNovoFuncionario->cvEmail, "\n")] = '\0';
+        printf("\nTelefone: ");
+        fgets(fNovoFuncionario->cvTelefone, sizeof(fNovoFuncionario->cvTelefone), stdin);
+        fNovoFuncionario->cvTelefone[strcspn(fNovoFuncionario->cvTelefone, "\n")] = '\0';
+        printf("\nCelular: ");
+        fgets(fNovoFuncionario->cvCelular, sizeof(fNovoFuncionario->cvCelular), stdin);
+        fNovoFuncionario->cvCelular[strcspn(fNovoFuncionario->cvCelular, "\n")] = '\0';
+        printf("\nEndereco: ");
+        fgets(fNovoFuncionario->cvEndereco, sizeof(fNovoFuncionario->cvEndereco), stdin);
+        printf("\n\t\t\tENTRANDO...\n");
+        Sleep(500);
+        system("cls || clear");
         menu();
 		
 	}else{
@@ -1091,6 +1112,7 @@ void alteraFuncionario()
                     break;
                 }
             } while ((iOp < 1) || (iOp > 3));
+            flush_in();
             printf("\nCPF: ");
             fgets(fAux->cvCpf, sizeof(fAux->cvCpf), stdin);
             fAux->cvCpf[strcspn(fAux->cvCpf, "\n")] = '\0';
@@ -1143,8 +1165,11 @@ void removeFuncionario()
         {
             if (!strcmp(fAux->cvNomeFunc, cvNomeP))
             {
-                if (fFuncionarioInicial->funProximo == NULL)
-                    fFornecedorInicial = NULL;
+                if (fFuncionarioInicial->funProximo == NULL){ //nao pode ser removido pois eh a chave para o sistema
+					printf("\n\t\t\tESTE FUNCIONARIO NAO PODE SER REMOVIDO\n");
+					return 0;
+				}
+				
                 strcpy(cvNomeTemp, fAux->cvNomeFunc);
                 if (fAux == fFuncionarioInicial)
                 {
