@@ -519,6 +519,8 @@ int alteraProduto()
 
 void removeProduto()
 {
+	Produto *pAux = pProdutoInicial;
+	Produto *pAnterior;
     printf("\nRemover produto");
     if (pProdutoInicial == NULL)
     {
@@ -538,16 +540,23 @@ void removeProduto()
         }
         else
         {   
-            Produto *pAux = pProdutoInicial;
-            Produto *pAnterior;
-            while(pAux->pProximo != NULL){
-            	pAnterior = pAux;
-            	pAux = pAux->pProximo;
+            while(pAux != NULL){
             	if(!strcmp(pAux->cvNome, cvNomeP)){
-            		pAnterior->pProximo = pAux->pProximo;
-            		free(pAux);
+                    if(pAux == pProdutoInicial){
+                        pAux = pAux->pProximo;
+                        free(pProdutoInicial);
+                        pProdutoInicial = NULL;
+                        pProdutoInicial = pAux;
+                    }else{
+                        pAnterior->pProximo = pAux->pProximo;
+                        free(pAux);
+                        pAux = NULL;
+                        return 0;
+                    }
 				}
-			}
+                pAnterior = pAux;
+                pAux = pAux->pProximo;
+            }
         }
     }
 }

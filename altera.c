@@ -214,14 +214,24 @@ int removeQualquer(){
         free(inicio);
         inicio = NULL;
     }else{
-        while(aux->proximo != NULL){
+        while(aux != NULL){
+            if(!strcmp(aux->nome, nomeP)){
+                if(aux == inicio){
+                    aux = aux->proximo;
+                    inicio = NULL;
+                    inicio = aux;
+                    printf("%s\n", inicio->nome);
+                    
+                }else{
+                    anterior->proximo = aux->proximo;
+                    free(aux);
+                    aux = NULL;
+                    return 0;
+                }
+            }
             anterior = aux;
             aux = aux->proximo;
-            if(!strcmp(aux->nome, nomeP)){
-                anterior->proximo = aux->proximo;
-                free(aux);
-            }
-            
+           
         }
     }
 
