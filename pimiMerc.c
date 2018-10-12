@@ -6,6 +6,7 @@ typedef struct produto
     char cvNome[500];
     char cvValidade[100];
     float fValor;
+    int iQtdEstoque;
     int iCodigo;
     int iCodigoFornecedor;
     struct Produto *pProximo;
@@ -93,6 +94,7 @@ int menuPrincipal();
 int menu();
 int menuListar();
 int menuAlterar();
+int menuRemover();
 char escolhaRegistro();
 int menuCadastro();
 int cadastrarProduto();
@@ -199,6 +201,7 @@ int menuCadastro()
         switch (iOp)
         {
         case 0:
+        	system("cls || clear");
             break;
         case 1:
             cadastrarFuncionario();
@@ -219,7 +222,7 @@ int menuCadastro()
             menuAlterar();
             break;
         case 7:
-            removeProduto();
+            menuRemover();
             break;
         default:
             defaultMessage();
@@ -287,7 +290,41 @@ int menuAlterar()
             break;
         }
 
-    } while (iOp < 0 || iOp > 3);
+    } while (iOp < 0 || iOp > 4);
+}
+
+int menuRemover(){
+	system("cls || clear");
+	int iOp;
+	
+	do{
+		printf("\n\t\t\Alterar\n");
+        printf("\n0 - Sair");
+        printf("\n1- Remover Funcionario");
+        printf("\n2- Remover Clientes");
+        printf("\n3- Remover Produto");
+        printf("\n4- Remover Fornecedor");
+        printf("\nEntre com a opcao desejada: ");
+        scanf("%d", &iOp);	
+        switch(iOp){
+        	case 0:
+        		menuCadastro();
+        		break;
+        	case 1:
+        		break;
+        	case 2:
+        		break;
+        	case 3:
+        		removeProduto();
+        		break;
+        	case 4:
+        		removeFornecedor();
+        		break;
+        	default:
+        		defaultMessage();
+        		break;
+		}
+	}while(iOp < 0 || iOp > 4);
 }
 
 void tela(char tela[])
@@ -435,6 +472,8 @@ int cadastrarProduto(){
         pNovoProduto->cvValidade[strcspn(pNovoProduto->cvValidade, "\n")] = '\0';
         printf("\nValor do Produto(USAR '.' NO LUGAR DA ','): ");
         scanf("%f", &pNovoProduto->fValor);
+        printf("\nQuantidade no Estoque(APENAS NUMEROS): ");
+        scanf("%d", &pNovoProduto->iQtdEstoque);
         printf("\nCodigo do Produto(APENAS NUMEROS): ");
         scanf("%d", &pNovoProduto->iCodigo);
         printf("\nCodigo do Fornecedor: ");
@@ -500,6 +539,9 @@ int alteraProduto()
             printf("\nValor do Produto: ");
             scanf("%f", &pAux->fValor);
             pAux->fValor = pAux->fValor;
+            printf("\nQuantidade no Estoque(APENAS NUMEROS): ");
+        	scanf("%d", &pAux->iQtdEstoque);
+        	pAux->iQtdEstoque = pAux->iQtdEstoque;
             printf("\nCodigo do Produto: ");
             scanf("%d", &pAux->iCodigo);
             pAux->iCodigo = pAux->iCodigo;
@@ -521,7 +563,7 @@ void removeProduto()
 {
 	Produto *pAux = pProdutoInicial;
 	Produto *pAnterior;
-    printf("\nRemover produto");
+    printf("\n\t\t\tRemover produto\n");
     if (pProdutoInicial == NULL)
     {
         printf("\nA lista ja esta vazia!");
@@ -679,18 +721,35 @@ void alteraFornecedor()
 }
 
 void removeFornecedor(){
-    printf("\n\t\t\tRemover Produto\n");
+    printf("\n\t\t\tRemover Fornecedor\n");
+    Fornecedor *fAux = fFornecedorInicial;
+    Fornecedor *fAnterior;
     if(fFornecedorInicial == NULL){
         nullDelete();
     }else{
-        if(fFornecedorInicial->fProximo == NULL){
-            fFornecedorInicial = NULL;
-        }else{
-            Fornecedor *fAux = fFornecedorInicial;
-            fFornecedorInicial = fFornecedorInicial->fProximo;
-            free(fAux);
-            fAux = NULL;
-        }
+		char cvNomeP[201];
+        printf("Entre com o nome do fornecedore que deseja remover: ");
+        flush_in();
+        fgets(cvNomeP, sizeof(cvNomeP), stdin);
+        cvNomeP[strcspn(cvNomeP, "\n")] = '\0';
+        
+        while(fAux != NULL){
+        	if(!strcmp(fAux->cvNome, cvNomeP) || !strcmp(fAux->cvNomeFantasia, cvNomeP)){
+        		if(fAux == fFornecedorInicial){
+        			fAux = fAux->fProximo;
+        			free(fFornecedorInicial);
+        			fFornecedorInicial = NULL;
+        			fFornecedorInicial = fAux;
+				}else{
+					fAnterior->fProximo = fAux->fProximo;
+					free(fAux);
+					fAux = NULL;
+					return 0;
+				}
+			}
+			fAnterior = fAux;
+			fAux = fAux->fProximo;
+		}
     }
 }
 
