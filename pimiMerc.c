@@ -73,7 +73,7 @@ void editMessage(char cvFunction[]);
 void nullList();
 void nullDelete();
 void listarProdutos();
-void removeProduto(int iCodigoProduto);
+void removeProduto();
 void listarFornecedor();
 void alteraFornecedor();
 void removeFornecedor();
@@ -193,7 +193,7 @@ int menuCadastro()
         printf("\n4- Cadastrar Fornecedor");
         printf("\n5 - Listar");
         printf("\n6 - Alterar");
-        printf("\n7 - excluir");
+        printf("\n7 - Remover");
         printf("\n\nEntre com a opcao desejada: ");
         scanf("%d", &iOp);
         switch (iOp)
@@ -219,7 +219,7 @@ int menuCadastro()
             menuAlterar();
             break;
         case 7:
-            //removeProduto();
+            removeProduto();
             break;
         default:
             defaultMessage();
@@ -517,7 +517,7 @@ int alteraProduto()
     }
 }
 
-void removeProduto(int iCodigoProduto)
+void removeProduto()
 {
     printf("\nRemover produto");
     if (pProdutoInicial == NULL)
@@ -526,6 +526,12 @@ void removeProduto(int iCodigoProduto)
     }
     else
     {
+    	char cvNomeP[201];
+    	printf("Entre com o nome do produto que deseja remover: ");
+    	flush_in();
+    	fgets(cvNomeP, sizeof(cvNomeP), stdin);
+    	cvNomeP[strcspn(cvNomeP, "\n")] = '\0';
+    	
         if (pProdutoInicial->pProximo == NULL)
         {
             pProdutoInicial = NULL;
@@ -533,9 +539,15 @@ void removeProduto(int iCodigoProduto)
         else
         {   
             Produto *pAux = pProdutoInicial;
-            pProdutoInicial = pProdutoInicial->pProximo;
-            free(pAux);
-            pAux = NULL;
+            Produto *pAnterior;
+            while(pAux->pProximo != NULL){
+            	pAnterior = pAux;
+            	pAux = pAux->pProximo;
+            	if(!strcmp(pAux->cvNome, cvNomeP)){
+            		pAnterior->pProximo = pAux->pProximo;
+            		free(pAux);
+				}
+			}
         }
     }
 }

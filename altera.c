@@ -1,5 +1,3 @@
-
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -20,6 +18,9 @@ void listar();
 void sair();
 void pesquisar();
 void addP();
+void remover();
+int removeUltimo();
+int removeQualquer();
 
 int main()
 {
@@ -44,6 +45,15 @@ int main()
         case 4:
             addP();
             break;
+        case 5:
+            remover();
+            break;
+        case 6:
+            removeUltimo();
+            break;
+        case 7: 
+            removeQualquer();
+            break;
         }
     } while (op != 0);
     return 0;
@@ -59,15 +69,19 @@ int menu()
         printf("\n2 - Listar");
         printf("\n3 - Pesquisar");
         printf("\n4 - Adicionar comeco");
+        printf("\n5 - Remover");
+        printf("\n6 - Remover ultimo item");
+        printf("\n7 - Remover qualquer item");
         printf("\nEntre com a opcao desejada: ");
         scanf("%d", &op);
-        if (op < 0 || op > 4)
+        if (op < 0 || op > 7)
         {
             printf("\n\nOpcao invalida");
         }
-    } while (op < 0 || op > 4);
+    } while (op < 0 || op > 7);
     return op;
 }
+
 
 void addP()
 {
@@ -148,6 +162,69 @@ void listar()
 void sair()
 {
     printf("\nBye");
+}
+
+void remover()
+{
+    Aluno *aux = inicio;
+    if(inicio->proximo == NULL){
+        free(inicio);
+        inicio = NULL;
+    }else{
+        aux = aux->proximo;
+        free(inicio);
+        inicio = NULL;
+        inicio = aux;
+    }
+   
+    //printf("%s\n", inicio->nome);
+}
+
+int removeUltimo(){
+    Aluno *aux = inicio;
+    Aluno *anterior;
+    if(inicio == NULL) return 0; // se inicio for nulo nao faz nada
+    if(inicio->proximo == NULL){
+        free(inicio);
+        inicio = NULL;
+    }else{
+        while(aux->proximo != NULL){
+            anterior = aux;
+            aux = aux->proximo;
+        }
+        free(aux);
+        aux = NULL;
+        anterior->proximo = NULL;
+        //printf("%s\n", anterior->nome);
+    }
+}
+
+int removeQualquer(){
+    Aluno *aux = inicio;
+    Aluno *anterior;
+    char nomeP[201];
+    __fpurge(stdin);
+    printf("Digite o nome a ser excluido: ");
+    fgets(nomeP, sizeof(nomeP), stdin);
+    nomeP[strcspn(nomeP, "\n")] = '\0';
+    printf("%s\n", nomeP);
+
+    if(inicio == NULL) return 0; //se inicio for nulo nao faz nada
+    if(inicio->proximo == NULL){
+        free(inicio);
+        inicio = NULL;
+    }else{
+        while(aux->proximo != NULL){
+            anterior = aux;
+            aux = aux->proximo;
+            if(!strcmp(aux->nome, nomeP)){
+                anterior->proximo = aux->proximo;
+                free(aux);
+            }
+            
+        }
+    }
+
 }
 
 void pesquisar()
