@@ -319,6 +319,7 @@ int menuRemover(){
         		menuCadastro();
         		break;
         	case 1:
+        		removeFuncionario();
         		break;
         	case 2:
         		removeCliente();
