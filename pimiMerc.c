@@ -127,9 +127,13 @@ void nullDelete(){
 }
 
 char escolhaRegistro(){
-    char cEscolha;
-    printf("Deseja cadastrar um novo registro?(s/n) \n");
-    scanf(" %c", &cEscolha);
+    char cEscolha = 's';
+    do{
+    	printf("Deseja cadastrar um novo registro?(s/n) \n");
+    	scanf(" %c", &cEscolha);
+    	if(cEscolha == 's' || cEscolha == 'n') break;
+	}while(cEscolha != 's' || cEscolha != 'n');
+ 
     return cEscolha;
 }
 
@@ -397,7 +401,6 @@ void VerificarLogin()
         while (fAux != NULL)
         {
             if( (!strcmp(fAux->cvLogin, cvAcessoLogin)) && (!strcmp(fAux->cvSenha,cvAcessoSenha))){
-                //printf("\n\n\t\t\tLOGADO COM SUCESSO...\n\n");
                 system("cls || clear");
                 printf("\n\n\t\t\tBEM-VINDO %s... \n", fAux->cvNomeFunc);
                 printf("\t\t\tVoce esta operando como: %s \n\n", fAux->cvCargo);
@@ -408,6 +411,7 @@ void VerificarLogin()
         }
         
         if(iSenhaIgual == 0){
+        	system("cls || clear");
         	printf("\n\n\t\t\tUsuario nao cadastrado... Tente Novamente! \n\n");
 		}
 	
@@ -429,9 +433,9 @@ int cadastrarProduto(){
         printf("\nData de Validade: ");
         fgets(pNovoProduto->cvValidade, sizeof(pNovoProduto->cvValidade), stdin);
         pNovoProduto->cvValidade[strcspn(pNovoProduto->cvValidade, "\n")] = '\0';
-        printf("\nValor do Produto: ");
+        printf("\nValor do Produto(USAR '.' NO LUGAR DA ','): ");
         scanf("%f", &pNovoProduto->fValor);
-        printf("\nCodigo do Produto: ");
+        printf("\nCodigo do Produto(APENAS NUMEROS): ");
         scanf("%d", &pNovoProduto->iCodigo);
         printf("\nCodigo do Fornecedor: ");
         scanf("%d", &pNovoProduto->iCodigoFornecedor);
@@ -446,8 +450,10 @@ int cadastrarProduto(){
             }
             pAux->pProximo = pNovoProduto;
         }
-
-        cEscolha = escolhaRegistro();
+		
+	
+		cEscolha = escolhaRegistro();
+        
         system("cls || clear");
     }while(cEscolha != 'n');
 }
@@ -815,7 +821,7 @@ int cadastrarFuncionario(){
         }
         system("cls || clear");
         iAdm=1;
-        printf("%d",iAdm);
+        //printf("%d",iAdm);
         menu();
 		
 	}else{
