@@ -70,8 +70,10 @@ int iAdm = 0;
 /* DECLARACAO DE  FUNCOES */
 void sair();
 void defaultMessage();
+void removidoSucesso(char cvNomeFuncao[], char cvNomeItem[]);
 void editMessage(char cvFunction[]);
 void nullList();
+void notFound(char cvName[]);
 void nullDelete();
 void listarProdutos();
 void removeProduto();
@@ -120,10 +122,16 @@ void editMessage(char cvFunction[]){
     printf("\nEntre com o nome do %s a ser alterado: ", cvFunction);
 }
 
+void removidoSucesso(char cvNomeFuncao[], char cvNomeItem[]){
+	printf("\n\t\t\tO %s %s foi removido com sucesso!!\n", cvNomeFuncao, cvNomeItem);
+}
+
 void nullList(){
     printf("\nNao ha registros para serem listados!!!\n");
 }
-
+void notFound(char cvName[]){
+	printf("\n%s nao encontrado!", cvName);
+}
 void nullDelete(){
     printf("\nNao ha registros para serem removidos!!\n");
 }
@@ -313,6 +321,7 @@ int menuRemover(){
         	case 1:
         		break;
         	case 2:
+        		removeCliente();
         		break;
         	case 3:
         		removeProduto();
@@ -506,8 +515,8 @@ void listarProdutos(){
     }else{
         Produto *pAux = pProdutoInicial;
         while(pAux != NULL){
-            printf("\nNome: %s |\tValidade: %s", pAux->cvNome, pAux->cvValidade);
-            printf("\nValor: %.2f |\tCodigo: %d |\tCodigo Fornecedor: %d", pAux->fValor, pAux->iCodigo, pAux->iCodigoFornecedor);
+            printf("\nNome: %s |\tValidade: %s|\tValor: %.2f", pAux->cvNome, pAux->cvValidade,pAux->fValor);
+            printf("\nQuantidade Est.: %d |\tCodigo: %d |\tCodigo Fornecedor: %d", pAux->iQtdEstoque, pAux->iCodigo, pAux->iCodigoFornecedor);
             printf("\n------------------------------------------------------------------------------\n");
             pAux = pAux->pProximo;
         }
@@ -561,8 +570,8 @@ int alteraProduto()
 
 void removeProduto()
 {
-	Produto *pAux = pProdutoInicial;
-	Produto *pAnterior;
+    Produto *pAux = pProdutoInicial;
+    Produto *pAnterior;
     printf("\n\t\t\tRemover produto\n");
     if (pProdutoInicial == NULL)
     {
@@ -570,36 +579,45 @@ void removeProduto()
     }
     else
     {
-    	char cvNomeP[201];
-    	printf("Entre com o nome do produto que deseja remover: ");
-    	flush_in();
-    	fgets(cvNomeP, sizeof(cvNomeP), stdin);
-    	cvNomeP[strcspn(cvNomeP, "\n")] = '\0';
-    	
-        if (pProdutoInicial->pProximo == NULL)
+        char cvNomeP[201];
+        char cvNomeTemp[200]; //Armazena o nome do item excluido temporariamente
+        int iNaoEncontrado = 0;
+        printf("Entre com o nome do produto que deseja remover: ");
+        flush_in();
+        fgets(cvNomeP, sizeof(cvNomeP), stdin);
+        cvNomeP[strcspn(cvNomeP, "\n")] = '\0';
+
+        while (pAux != NULL)
         {
-            pProdutoInicial = NULL;
-        }
-        else
-        {   
-            while(pAux != NULL){
-            	if(!strcmp(pAux->cvNome, cvNomeP)){
-                    if(pAux == pProdutoInicial){
-                        pAux = pAux->pProximo;
-                        free(pProdutoInicial);
-                        pProdutoInicial = NULL;
-                        pProdutoInicial = pAux;
-                    }else{
-                        pAnterior->pProximo = pAux->pProximo;
-                        free(pAux);
-                        pAux = NULL;
-                        return 0;
-                    }
-				}
-                pAnterior = pAux;
-                pAux = pAux->pProximo;
+            if (!strcmp(pAux->cvNome, cvNomeP))
+            {
+            	if(pProdutoInicial->pProximo == NULL) pProdutoInicial = NULL; // se o inicial nao tiver proximo, deve receber nulo
+                strcpy(cvNomeTemp, pAux->cvNome);
+                if (pAux == pProdutoInicial)
+                {
+                    pAux = pAux->pProximo;
+                    free(pProdutoInicial);
+                    pProdutoInicial = NULL;
+                    pProdutoInicial = pAux;
+                    removidoSucesso("Produto",cvNomeTemp);   
+                }
+                else
+                {
+                    pAnterior->pProximo = pAux->pProximo;
+                    free(pAux);
+                    pAux = NULL;
+                    removidoSucesso("Produto",cvNomeTemp);
+                    return 0;
+                }
+                iNaoEncontrado++;
             }
+            pAnterior = pAux;
+            pAux = pAux->pProximo;
         }
+
+        if (iNaoEncontrado == 0)
+            notFound("Produto");
+        free(cvNomeTemp);
     }
 }
 
@@ -728,28 +746,37 @@ void removeFornecedor(){
         nullDelete();
     }else{
 		char cvNomeP[201];
-        printf("Entre com o nome do fornecedore que deseja remover: ");
+		char cvNomeTemp[200]; //Armazena o nome do item excluido temporariamente
+		int iNaoEncontrado = 0;
+        printf("Entre com o nome do fornecedor que deseja remover: ");
         flush_in();
         fgets(cvNomeP, sizeof(cvNomeP), stdin);
         cvNomeP[strcspn(cvNomeP, "\n")] = '\0';
         
         while(fAux != NULL){
         	if(!strcmp(fAux->cvNome, cvNomeP) || !strcmp(fAux->cvNomeFantasia, cvNomeP)){
+        		if(fFornecedorInicial->fProximo == NULL) fFornecedorInicial = NULL;
+        		strcpy(cvNomeTemp, fAux->cvNome);
         		if(fAux == fFornecedorInicial){
         			fAux = fAux->fProximo;
         			free(fFornecedorInicial);
         			fFornecedorInicial = NULL;
         			fFornecedorInicial = fAux;
+        			removidoSucesso("Fornecedor", cvNomeTemp);
 				}else{
 					fAnterior->fProximo = fAux->fProximo;
 					free(fAux);
 					fAux = NULL;
+					removidoSucesso("Fornecedor", cvNomeTemp);
 					return 0;
 				}
+				iNaoEncontrado++;
 			}
 			fAnterior = fAux;
 			fAux = fAux->fProximo;
 		}
+		if(iNaoEncontrado == 0 ) notFound("Fornecedor");
+		free(cvNomeTemp);
     }
 }
 
@@ -866,17 +893,44 @@ void alteraCliente()
 
 void removeCliente(){
     printf("\n\t\t\tRemovendo Cliente\n");
+    Cliente *cAux = cClienteInicial;
+    Cliente *cAnterior;
     if(cClienteInicial == NULL){
         nullDelete();
     }else{
-        if(cClienteInicial->cProximo == NULL){
-            cClienteInicial = NULL;
-        }else{
-            Cliente *cAux = cClienteInicial;
-            cClienteInicial = cClienteInicial->cProximo;
-            free(cAux);
-            cAux = NULL;
-        }
+    	
+        char cvNomeP[201];
+        char cvNomeTemp[200]; //Armazena o nome do item excluido temporariamente
+        int iNaoEncontrado = 0;
+        flush_in();
+        printf("Entre com o nome do cliente que deseja remover: ");
+        fgets(cvNomeP, sizeof(cvNomeP), stdin);
+        cvNomeP[strcspn(cvNomeP, "\n")] = '\0';
+        
+        while(cAux != NULL){
+        	if(!strcmp(cAux->cvNomeCli, cvNomeP)){
+        		if(cClienteInicial->cProximo == NULL) cClienteInicial = NULL;
+        		strcpy(cvNomeTemp, cAux->cvNomeCli);
+        		if(cAux == cClienteInicial){
+        			cAux = cAux->cProximo;
+        			free(cClienteInicial);
+					cClienteInicial = NULL;
+					cClienteInicial = cAux;
+					removidoSucesso("Cliente", cvNomeTemp);
+				}else{
+					cAnterior->cProximo = cAux->cProximo;
+					free(cAux);
+					cAux = NULL;
+					removidoSucesso("Cliente", cvNomeTemp);
+					return 0;
+				}
+				iNaoEncontrado++;
+			}
+			cAnterior = cAux;
+			cAux = cAux->cProximo;
+		}
+		if(iNaoEncontrado == 0) notFound("Cliente");
+		free(cvNomeTemp);
     }
 }
 
@@ -1065,19 +1119,55 @@ void alteraFuncionario()
     }
 }
 
-void removeFuncionario(){
+void removeFuncionario()
+{
     printf("\n\t\t\tRemovendo Funcionario\n");
-    if(fFuncionarioInicial == NULL){
+    Funcionario *fAux = fFuncionarioInicial;
+    Funcionario *fAnterior;
+    if (fFuncionarioInicial == NULL)
+    {
         nullDelete();
-    }else{
-        if(fFuncionarioInicial->funProximo == NULL){
-            fFuncionarioInicial = NULL;
-        }else{
-            Funcionario *fAux = fFuncionarioInicial;
-            fFuncionarioInicial = fFuncionarioInicial->funProximo;
-            free(fAux);
-            fAux = NULL;
+    }
+    else
+    {
+        char cvNomeP[201];
+        char cvNomeTemp[200]; // Armazena o nome do item excluido temporariamente
+        int iNaoEncontrado = 0;
+        flush_in();
+        printf("Entre com o nome do funcionario que deseja remover: ");
+        fgets(cvNomeP, sizeof(cvNomeP), stdin);
+        cvNomeP[strcspn(cvNomeP, "\n")] = '\0';
+
+        while (fAux != NULL)
+        {
+            if (!strcmp(fAux->cvNomeFunc, cvNomeP))
+            {
+                if (fFuncionarioInicial->funProximo == NULL)
+                    fFornecedorInicial = NULL;
+                strcpy(cvNomeTemp, fAux->cvNomeFunc);
+                if (fAux == fFuncionarioInicial)
+                {
+                    fAux = fAux->funProximo;
+                    free(fFuncionarioInicial);
+                    fFuncionarioInicial = NULL;
+                    fFuncionarioInicial = fAux;
+                    removidoSucesso("Funcionario", cvNomeTemp);
+                }
+                else
+                {
+                    fAnterior->funProximo = fAux->funProximo;
+                    free(fAux);
+                    fAux = NULL;
+                    removidoSucesso("Funcionario", cvNomeTemp);
+                    return 0;
+                }
+                iNaoEncontrado++;
+            }
+            fAnterior = fAux;
+            fAux = fAux->funProximo;
         }
+        if (iNaoEncontrado == 0)
+            notFound("Funcionario");
     }
 }
 
