@@ -486,7 +486,7 @@ int cadastrarProduto(){
         scanf("%d", &pNovoProduto->iQtdEstoque);
         printf("\nCodigo do Produto(APENAS NUMEROS): ");
         scanf("%d", &pNovoProduto->iCodigo);
-        printf("\nCodigo do Fornecedor: ");
+        printf("\nCodigo do Fornecedor(APENAS NUMEROS): ");
         scanf("%d", &pNovoProduto->iCodigoFornecedor);
         flush_in();
 
@@ -537,7 +537,6 @@ int alteraProduto()
     {
         if (!strcmp(pAux->cvNome, cvBNome))
         {
-            flush_in();
             printf("\nNome do produto: ");
             fgets(pAux->cvNome, sizeof(pAux->cvNome), stdin);
             pAux->cvNome[strcspn(pAux->cvNome, "\n")] = '\0';
@@ -546,16 +545,16 @@ int alteraProduto()
             fgets(pAux->cvValidade, sizeof(pAux->cvValidade), stdin);
             pAux->cvValidade[strcspn(pAux->cvValidade, "\n")] = '\0';
             strcpy(pAux->cvValidade, pAux->cvValidade);
-            printf("\nValor do Produto: ");
+            printf("\nValor do Produto(USAR '.' NO LUGAR DA ','): ");
             scanf("%f", &pAux->fValor);
             pAux->fValor = pAux->fValor;
             printf("\nQuantidade no Estoque(APENAS NUMEROS): ");
         	scanf("%d", &pAux->iQtdEstoque);
         	pAux->iQtdEstoque = pAux->iQtdEstoque;
-            printf("\nCodigo do Produto: ");
+            printf("\nCodigo do Produto(APENAS NUMEROS): ");
             scanf("%d", &pAux->iCodigo);
             pAux->iCodigo = pAux->iCodigo;
-            printf("\nCodigo do Fornecedor: ");
+            printf("\nCodigo do Fornecedor(APENAS NUMEROS): ");
             scanf("%d", &pAux->iCodigoFornecedor);
             pAux->iCodigoFornecedor = pAux->iCodigoFornecedor;
             iNaoEncontrado++;
@@ -582,6 +581,7 @@ void removeProduto()
     {
         char cvNomeP[201];
         char cvNomeTemp[200]; //Armazena o nome do item excluido temporariamente
+        char cEscolha;
         int iNaoEncontrado = 0;
         printf("Entre com o nome do produto que deseja remover: ");
         flush_in();
@@ -592,7 +592,8 @@ void removeProduto()
         {
             if (!strcmp(pAux->cvNome, cvNomeP))
             {
-            	if(pProdutoInicial->pProximo == NULL) pProdutoInicial = NULL; // se o inicial nao tiver proximo, deve receber nulo
+                if (pProdutoInicial->pProximo == NULL)
+                    pProdutoInicial = NULL; // se o inicial nao tiver proximo, deve receber nulo
                 strcpy(cvNomeTemp, pAux->cvNome);
                 if (pAux == pProdutoInicial)
                 {
@@ -600,14 +601,14 @@ void removeProduto()
                     free(pProdutoInicial);
                     pProdutoInicial = NULL;
                     pProdutoInicial = pAux;
-                    removidoSucesso("Produto",cvNomeTemp);   
+                    removidoSucesso("Produto", cvNomeTemp);
                 }
                 else
                 {
                     pAnterior->pProximo = pAux->pProximo;
                     free(pAux);
                     pAux = NULL;
-                    removidoSucesso("Produto",cvNomeTemp);
+                    removidoSucesso("Produto", cvNomeTemp);
                     return 0;
                 }
                 iNaoEncontrado++;
@@ -615,10 +616,8 @@ void removeProduto()
             pAnterior = pAux;
             pAux = pAux->pProximo;
         }
-
         if (iNaoEncontrado == 0)
             notFound("Produto");
-        free(cvNomeTemp);
     }
 }
 
@@ -652,7 +651,7 @@ int cadastrarFornecedor(){
         printf("\nCelular: ");
         fgets(novoFornecedor->cvCelular, sizeof(novoFornecedor->cvCelular), stdin);
         novoFornecedor->cvCelular[strcspn(novoFornecedor->cvCelular, "\n")] = '\0';
-        printf("\nCodigo Produto: ");
+        printf("\nCodigo Produto(APENAS NUMEROS): ");
         scanf("%d", &novoFornecedor->iCodigoProduto);
 
         if(fFornecedorInicial == NULL) {
@@ -725,7 +724,7 @@ void alteraFornecedor()
             printf("\nCelular: ");
             fgets(fAux->cvCelular, sizeof(fAux->cvCelular), stdin);
             fAux->cvCelular[strcspn(fAux->cvCelular, "\n")] = '\0';
-            printf("\nCodigo Produto: ");
+            printf("\nCodigo Produto(APENAS NUMEROS): ");
             scanf("%d", &fAux->iCodigoProduto);
             iNaoEncontrado++;
             break;
@@ -777,7 +776,7 @@ void removeFornecedor(){
 			fAux = fAux->fProximo;
 		}
 		if(iNaoEncontrado == 0 ) notFound("Fornecedor");
-		free(cvNomeTemp);
+		
     }
 }
 
@@ -931,7 +930,7 @@ void removeCliente(){
 			cAux = cAux->cProximo;
 		}
 		if(iNaoEncontrado == 0) notFound("Cliente");
-		free(cvNomeTemp);
+		
     }
 }
 
