@@ -52,11 +52,31 @@ typedef struct funcionario
     struct Funcionario *funProximo;
 } Funcionario;
 
+typedef struct venda
+{
+	//int iCodProduto;
+	int iCodVenda;
+	//int iQtdProduto;
+	/*int iVeriVendaProduto;
+	int iFormaPagamento;
+	float dValTotalItem;*/
+	float dTotalCompra;
+    struct Venda *vendaProximo;
+} Venda;
+
+typedef struct itemVenda{
+	char cvNomeItem[201];
+	float fValorItem;
+	struct ItemVenda *iItemProximo;
+}ItemVenda;
+
 /* DECLARACAO DE STRUCTS */
 Produto *pProdutoInicial = NULL;
 Fornecedor *fFornecedorInicial = NULL;
 Cliente *cClienteInicial = NULL;
 Funcionario *fFuncionarioInicial = NULL;
+Venda *vVendaInicial = NULL;
+ItemVenda *iItemVendaInicial = NULL;
 int iAdm = 0;
 
 /**
@@ -90,6 +110,7 @@ void flush_in();
 void CadastroLogin(char cvCadastroLogin[],char cvCadastroSenha[]);
 void VerificarLogin();
 void tela(char tela[]);
+void listarVenda();
 
 /* DECLARACAO DE FUNCOES QUE RETORNAM VALOR */
 int menuPrincipal();
@@ -103,6 +124,7 @@ int cadastrarProduto();
 int cadastrarFornecedor();
 int cadastrarCliente();
 int cadastrarFuncionario();
+int venda();
 
 
 int main(){
@@ -171,7 +193,6 @@ int menu()
         {
         case 0:
         	system("cls || clear");
-        	//Funcionario *fNovoFuncionario = (Funcionario *) malloc(sizeof(Funcionario));
             VerificarLogin();
             break;
         case 1:
@@ -179,7 +200,8 @@ int menu()
             menuCadastro();
             break;
         case 2:
-            printf("\n Iniciando Caixa...\n");
+            system("cls || clear");
+			venda();
             break;
         case 3:
             printf("\n Iniciando Estoque...\n");
@@ -1194,6 +1216,114 @@ void removeFuncionario()
         if (iNaoEncontrado == 0)
             notFound("Funcionario");
     }
+}
+
+int venda(){
+	
+	char cFinalizar;
+	int iCodProduto;
+	int iFormaPag;
+	int iNaoEncontrado = 0;
+	int iQuantidade = 0;
+	float fDinheiroRecebido = 0;
+	
+	//laco para a venda
+	do{
+		//laco para itemVenda
+		do{
+			ItemVenda *iNovoItem = (ItemVenda*) malloc(sizeof(ItemVenda));
+			iNovoItem->iItemProximo = NULL;
+			printf("Entre com o codigo do produto: ");
+			scanf("%d", &iCodProduto);
+			//declarar a struct aux de produtos para pesquisa
+			Produto *pAux = pProdutoInicial;
+			while(pAux != NULL){
+				if(pAux->iCodigo == iCodProduto){
+					strcpy(iNovoItem->cvNomeItem, pAux->cvNome);
+					printf("Entre com a quantidade de compra: ");
+					scanf("%d", &iQuantidade);
+					iNovoItem->fValorItem = pAux->fValor * iQuantidade;
+					pAux->iQtdEstoque -= iQuantidade;
+					//colocando item na struct
+					if(iItemVendaInicial == NULL){
+						iItemVendaInicial = iNovoItem;
+					}else{
+						//auxiliar de item venda
+						ItemVenda *itemAux = iItemVendaInicial;
+						while(itemAux->iItemProximo != NULL){
+							itemAux = itemAux->iItemProximo;
+						}
+						itemAux->iItemProximo = iNovoItem;
+					}
+					break;
+				}
+				pAux = pAux->pProximo;
+			}//fim while produto
+			printf("Finalizar items? (s)");
+			scanf(" %c", &cFinalizar);
+		}while(cFinalizar != 's');
+		
+		//colocar na struct de venda
+		Venda *vNovaVenda = (Venda*) malloc(sizeof(Venda));
+		vNovaVenda->vendaProximo = NULL;
+		
+		//percorrer e jogar para a venda os valores
+		ItemVenda *itemAux2 = iItemVendaInicial;
+		while(itemAux2 != NULL){
+			vNovaVenda->iCodVenda += 1;
+			vNovaVenda->dTotalCompra += itemAux2->fValorItem;
+			itemAux2 = itemAux2->iItemProximo;
+		}
+		
+		printf("Valor da compra: %.2f\n", vNovaVenda->dTotalCompra);
+		
+		printf("Qual a forma de pagamento?\n");
+		printf("1 - Dinheiro\n");
+		printf("2 - Cartao\n");
+		scanf("%d", &iFormaPag);
+		switch(iFormaPag){
+			case 1:
+				
+				printf("Dinheiro recebido do cliente: ");
+				scanf("%f", &fDinheiroRecebido);
+				//se nao for igual - ESTOU NEGANDO
+				if(fDinheiroRecebido > vNovaVenda->dTotalCompra){
+					float fTroco = 0;
+					fTroco = fDinheiroRecebido - vNovaVenda->dTotalCompra;
+					printf("TROCO: %.2f", fTroco);
+				}
+				break;
+		}
+		
+		if(vVendaInicial == NULL){
+			vVendaInicial = vNovaVenda;
+			//liberar a memoria do item venda para nao somar com anteriores
+			free(itemAux2);
+			iItemVendaInicial = NULL;
+		}else{
+			Venda *vAux = vVendaInicial;
+			while(vAux->vendaProximo != NULL){
+				vAux = vAux->vendaProximo;
+			}
+			vAux->vendaProximo = vNovaVenda;
+			free(itemAux2);
+			iItemVendaInicial = NULL;
+		}
+		
+		printf("Finalizar venda? (s)");
+		scanf(" %c", &cFinalizar);	
+	}while(cFinalizar != 's');
+	listarVenda();
+	return 0;	
+}
+
+void listarVenda(){
+	
+	Venda *vAux = vVendaInicial;
+	while(vAux != NULL){
+		printf("Codigo Venda: %d\t Total da Venda: R$%.2f\n", vAux->iCodVenda, vAux->dTotalCompra);
+		vAux = vAux->vendaProximo;
+	}
 }
 
 //Limpa buffer do teclado
