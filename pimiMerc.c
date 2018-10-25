@@ -7,7 +7,7 @@ typedef struct produto
     char cvValidade[100];
     float fValor;
     int iQtdEstoque;
-    int iCodigo;
+    char cvCodigo[50];
     int iCodigoFornecedor;
     struct Produto *pProximo;
 } Produto;
@@ -495,9 +495,11 @@ int cadastrarProduto(){
     do{
         Produto *pNovoProduto = (Produto*) malloc(sizeof(Produto));
         pNovoProduto->pProximo = NULL;
-
+		flush_in();
+		printf("\nCodigo do Produto: ");
+        fgets(pNovoProduto->cvCodigo, sizeof(pNovoProduto->cvCodigo), stdin);
+        pNovoProduto->cvCodigo[strcspn(pNovoProduto->cvCodigo, "\n")] = '\0';
         printf("\nNome do produto: ");
-        flush_in();
         fgets(pNovoProduto->cvNome, sizeof(pNovoProduto->cvNome), stdin);
         pNovoProduto->cvNome[strcspn(pNovoProduto->cvNome, "\n")] = '\0';
         printf("\nData de Validade: ");
@@ -507,8 +509,6 @@ int cadastrarProduto(){
         scanf("%f", &pNovoProduto->fValor);
         printf("\nQuantidade no Estoque(APENAS NUMEROS): ");
         scanf("%d", &pNovoProduto->iQtdEstoque);
-        printf("\nCodigo do Produto(APENAS NUMEROS): ");
-        scanf("%d", &pNovoProduto->iCodigo);
         printf("\nCodigo do Fornecedor(APENAS NUMEROS): ");
         scanf("%d", &pNovoProduto->iCodigoFornecedor);
         flush_in();
@@ -540,7 +540,7 @@ void listarProdutos(){
         Produto *pAux = pProdutoInicial;
         while(pAux != NULL){
             printf("\nNome: %s |\tValidade: %s|\tValor: %.2f", pAux->cvNome, pAux->cvValidade,pAux->fValor);
-            printf("\nQuantidade Est.: %d |\tCodigo: %d |\tCodigo Fornecedor: %d", pAux->iQtdEstoque, pAux->iCodigo, pAux->iCodigoFornecedor);
+            printf("\nQuantidade Est.: %d |\tCodigo: %s |\tCodigo Fornecedor: %d", pAux->iQtdEstoque, pAux->cvCodigo, pAux->iCodigoFornecedor);
             printf("\n------------------------------------------------------------------------------\n");
             pAux = pAux->pProximo;
         }
@@ -560,26 +560,22 @@ int alteraProduto()
     {
         if (!strcmp(pAux->cvNome, cvBNome))
         {
-            printf("\nNome do produto: ");
+            printf("\nCodigo do Produto: ");
+            fgets(pAux->cvCodigo, sizeof(pAux->cvCodigo), stdin);
+            pAux->cvCodigo[strcspn(pAux->cvCodigo, "\n")] ='\0';
+			printf("\nNome do produto: ");
             fgets(pAux->cvNome, sizeof(pAux->cvNome), stdin);
             pAux->cvNome[strcspn(pAux->cvNome, "\n")] = '\0';
-            strcpy(pAux->cvNome, pAux->cvNome);
             printf("\nData de Validade: ");
             fgets(pAux->cvValidade, sizeof(pAux->cvValidade), stdin);
             pAux->cvValidade[strcspn(pAux->cvValidade, "\n")] = '\0';
-            strcpy(pAux->cvValidade, pAux->cvValidade);
             printf("\nValor do Produto(USAR '.' NO LUGAR DA ','): ");
             scanf("%f", &pAux->fValor);
-            pAux->fValor = pAux->fValor;
             printf("\nQuantidade no Estoque(APENAS NUMEROS): ");
         	scanf("%d", &pAux->iQtdEstoque);
-        	pAux->iQtdEstoque = pAux->iQtdEstoque;
-            printf("\nCodigo do Produto(APENAS NUMEROS): ");
-            scanf("%d", &pAux->iCodigo);
-            pAux->iCodigo = pAux->iCodigo;
+            
             printf("\nCodigo do Fornecedor(APENAS NUMEROS): ");
             scanf("%d", &pAux->iCodigoFornecedor);
-            pAux->iCodigoFornecedor = pAux->iCodigoFornecedor;
             iNaoEncontrado++;
             break;
         }
@@ -1224,8 +1220,8 @@ int venda(){
 	char cFinalizar;
 	char cJaCliente;
 	char cvNomeCliente[201];
+	char cvCodProduto[51];
 	int iVerificaCli;
-	int iCodProduto;
 	int iFormaPag;
 	int iNaoEncontrado = 0;
 	int iQuantidade = 0;
@@ -1252,11 +1248,12 @@ int venda(){
 			ItemVenda *iNovoItem = (ItemVenda*) malloc(sizeof(ItemVenda));
 			iNovoItem->iItemProximo = NULL;
 			printf("Entre com o codigo do produto: ");
-			scanf("%d", &iCodProduto);
+			fgets(cvCodProduto, sizeof(cvCodProduto), stdin);
+			cvCodProduto[strcspn(cvCodProduto, "\n")] = '\0';
 			//declarar a struct aux de produtos para pesquisa
 			Produto *pAux = pProdutoInicial;
 			while(pAux != NULL){
-				if(pAux->iCodigo == iCodProduto){
+				if(!strcmp(pAux->cvCodigo, cvCodProduto)){
 					strcpy(iNovoItem->cvNomeItem, pAux->cvNome);
 					printf("\n**************************************************\nProduto: %s\t Vl. Unitario: R$ %.2f\n**************************************************\n", pAux->cvNome, pAux->fValor);
 					printf("Entre com a quantidade de compra: ");
