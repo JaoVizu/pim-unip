@@ -1354,26 +1354,35 @@ int venda(){
 	float fDinheiroRecebido = 0;
 	float totalVenda = 0;
 	//desconto para clientes
-	printf("***** DESCONTO PARA CLIENTES ******\n\n");
-	/*printf("Ja eh cliente? (s/n)");
 	fflush(stdin);
-	scanf(" %c", &cJaCliente);*/
+	printf("\t\t\t***** DESCONTO PARA CLIENTES ******\n\n");
+	printf("Ja eh cliente? (s/n)");
+	scanf(" %c", &cJaCliente);
 	
-	//if(cJaCliente == 's'){
+	if(cJaCliente == 's'){
 		fflush(stdin);	
 		printf("Entre com o nome do cliente: ");	
 		fgets(cvNomeCliente, sizeof(cvNomeCliente), stdin);
 		cvNomeCliente[strcspn(cvNomeCliente, "\n")] = '\0';
 		iVerificaCli = verificaCliente(cvNomeCliente);
-	//}
+		if(iVerificaCli){
+			printf("Cliente cadastrado no sistema!! Os descontos serao aplicados!\n");
+		}else{
+			printf("Cliente nao cadastrado no sistema!!\n");
+		}
+	}else{
+		system("cls || clear");
+		printf("Cliente nao cadastrado no sistema!!\n");
+	}
 	
 	//laco para a venda
 	do{
 		//laco para itemVenda
 		do{
+			//flush_in();
 			ItemVenda *iNovoItem = (ItemVenda*) malloc(sizeof(ItemVenda));
 			iNovoItem->iItemProximo = NULL;
-			printf("Entre com o codigo do produto: ");
+			printf("\n\nEntre com o codigo do produto: ");
 			fgets(cvCodProduto, sizeof(cvCodProduto), stdin);
 			cvCodProduto[strcspn(cvCodProduto, "\n")] = '\0';
 			//declarar a struct aux de produtos para pesquisa
@@ -1462,6 +1471,8 @@ int venda(){
 		scanf(" %c", &cFinalizar);	
 	}while(cFinalizar != 's');
 	listarVenda();
+	//limpar item venda
+	iItemVendaInicial = NULL;
 	return 0;	
 }
 
