@@ -125,6 +125,7 @@ int cadastrarFornecedor();
 int cadastrarCliente();
 int cadastrarFuncionario();
 int venda();
+int verificaCliente(char cvNome[]);
 
 
 int main(){
@@ -1221,11 +1222,28 @@ void removeFuncionario()
 int venda(){
 	
 	char cFinalizar;
+	char cJaCliente;
+	char cvNomeCliente[201];
+	int iVerificaCli;
 	int iCodProduto;
 	int iFormaPag;
 	int iNaoEncontrado = 0;
 	int iQuantidade = 0;
 	float fDinheiroRecebido = 0;
+	float totalVenda = 0;
+	//desconto para clientes
+	printf("***** DESCONTO PARA CLIENTES ******\n\n");
+	/*printf("Ja eh cliente? (s/n)");
+	fflush(stdin);
+	scanf(" %c", &cJaCliente);*/
+	
+	//if(cJaCliente == 's'){
+		fflush(stdin);	
+		printf("Entre com o nome do cliente: ");	
+		fgets(cvNomeCliente, sizeof(cvNomeCliente), stdin);
+		cvNomeCliente[strcspn(cvNomeCliente, "\n")] = '\0';
+		iVerificaCli = verificaCliente(cvNomeCliente);
+	//}
 	
 	//laco para a venda
 	do{
@@ -1240,10 +1258,12 @@ int venda(){
 			while(pAux != NULL){
 				if(pAux->iCodigo == iCodProduto){
 					strcpy(iNovoItem->cvNomeItem, pAux->cvNome);
+					printf("\n**************************************************\nProduto: %s\t Vl. Unitario: R$ %.2f\n**************************************************\n", pAux->cvNome, pAux->fValor);
 					printf("Entre com a quantidade de compra: ");
 					scanf("%d", &iQuantidade);
 					iNovoItem->fValorItem = pAux->fValor * iQuantidade;
 					pAux->iQtdEstoque -= iQuantidade;
+					totalVenda += iNovoItem->fValorItem;
 					//colocando item na struct
 					if(iItemVendaInicial == NULL){
 						iItemVendaInicial = iNovoItem;
@@ -1259,58 +1279,63 @@ int venda(){
 				}
 				pAux = pAux->pProximo;
 			}//fim while produto
+			printf("Total: R$ %.2f\n", totalVenda);
 			printf("Finalizar items? (s)");
 			scanf(" %c", &cFinalizar);
+			system("cls || clear");
 		}while(cFinalizar != 's');
 		
 		//colocar na struct de venda
 		Venda *vNovaVenda = (Venda*) malloc(sizeof(Venda));
 		vNovaVenda->vendaProximo = NULL;
 		
-		//percorrer e jogar para a venda os valores
-		ItemVenda *itemAux2 = iItemVendaInicial;
-		while(itemAux2 != NULL){
-			vNovaVenda->iCodVenda += 1;
-			vNovaVenda->dTotalCompra += itemAux2->fValorItem;
-			itemAux2 = itemAux2->iItemProximo;
+		//jogando valores para a nova venda
+		vNovaVenda->iCodVenda++;
+		vNovaVenda->dTotalCompra = totalVenda;
+		
+		printf("Valor da compra: R$ %.2f\n", vNovaVenda->dTotalCompra);
+		//adm podera alterar
+		if(iVerificaCli){
+			if(vNovaVenda->dTotalCompra >= 50){
+				vNovaVenda->dTotalCompra = vNovaVenda->dTotalCompra - (vNovaVenda->dTotalCompra * 0.05);
+				printf("Valor com desconto: R$ %.2f\n", vNovaVenda->dTotalCompra);	
+			}else if(vNovaVenda->dTotalCompra >= 100){
+				vNovaVenda->dTotalCompra = vNovaVenda->dTotalCompra - (vNovaVenda->dTotalCompra * 0.10);
+				printf("Valor com desconto: R$ %.2f\n", vNovaVenda->dTotalCompra);	
+			}
+			
 		}
 		
-		printf("Valor da compra: %.2f\n", vNovaVenda->dTotalCompra);
-		
-		printf("Qual a forma de pagamento?\n");
+		printf("Forma de pagamento?\n");
 		printf("1 - Dinheiro\n");
 		printf("2 - Cartao\n");
 		scanf("%d", &iFormaPag);
 		switch(iFormaPag){
 			case 1:
 				
-				printf("Dinheiro recebido do cliente: ");
+				printf("Dinheiro recebido do cliente: R$ ");
 				scanf("%f", &fDinheiroRecebido);
 				//se nao for igual - ESTOU NEGANDO
 				if(fDinheiroRecebido > vNovaVenda->dTotalCompra){
 					float fTroco = 0;
 					fTroco = fDinheiroRecebido - vNovaVenda->dTotalCompra;
-					printf("TROCO: %.2f", fTroco);
+					printf("TROCO: R$ %.2f\n", fTroco);
 				}
 				break;
 		}
 		
 		if(vVendaInicial == NULL){
 			vVendaInicial = vNovaVenda;
-			//liberar a memoria do item venda para nao somar com anteriores
-			free(itemAux2);
-			iItemVendaInicial = NULL;
 		}else{
 			Venda *vAux = vVendaInicial;
 			while(vAux->vendaProximo != NULL){
 				vAux = vAux->vendaProximo;
 			}
 			vAux->vendaProximo = vNovaVenda;
-			free(itemAux2);
-			iItemVendaInicial = NULL;
+			
 		}
 		
-		printf("Finalizar venda? (s)");
+		printf("Finalizar venda? (s)\n");
 		scanf(" %c", &cFinalizar);	
 	}while(cFinalizar != 's');
 	listarVenda();
@@ -1324,6 +1349,25 @@ void listarVenda(){
 		printf("Codigo Venda: %d\t Total da Venda: R$%.2f\n", vAux->iCodVenda, vAux->dTotalCompra);
 		vAux = vAux->vendaProximo;
 	}
+}
+
+int verificaCliente(char cvNome[]){
+	
+	int iNaoEncontrado = 0;
+	Cliente *cAux = cClienteInicial;
+	while(cAux != NULL){
+		if(!strcmp(cAux->cvNomeCli, cvNome)){
+			iNaoEncontrado++;
+		}
+		cAux = cAux->cProximo;
+	}
+	
+	if(iNaoEncontrado){
+		return 1;
+	}else{
+		return 0;
+	}
+	
 }
 
 //Limpa buffer do teclado
