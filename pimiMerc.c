@@ -92,6 +92,7 @@ void sair();
 void defaultMessage();
 void removidoSucesso(char cvNomeFuncao[], char cvNomeItem[]);
 void editMessage(char cvFunction[]);
+void alteradoSucesso(char cvContext[]);
 void nullList();
 void notFound(char cvName[]);
 void nullDelete();
@@ -121,6 +122,10 @@ int menuRemover();
 char escolhaRegistro();
 int menuCadastro();
 int cadastrarProduto();
+int alteraCodigoProduto();
+int alteraNomeProduto();
+int alteraValorProduto();
+int alteraQtdProduto();
 int cadastrarFornecedor();
 int cadastrarCliente();
 int cadastrarFuncionario();
@@ -143,6 +148,10 @@ void defaultMessage(){
 
 void editMessage(char cvFunction[]){
     printf("\nEntre com o nome do %s a ser alterado: ", cvFunction);
+}
+
+void alteradoSucesso(char cvContext[]){
+	printf("\n\t\t\t%s foi alterado(a) com sucesso!!!\n", cvContext);
 }
 
 void removidoSucesso(char cvNomeFuncao[], char cvNomeItem[]){
@@ -549,42 +558,159 @@ void listarProdutos(){
 
 int alteraProduto()
 {
-    Produto *pAux = pProdutoInicial;
-    int iNaoEncontrado = 0;
-    char cvBNome[201];
+   	system("cls || clear");
+    int iOp;
+    
+	do{
+    	printf("\n\t\t\Alterar Produtos\n");
+    	printf("0 - Sair\n");
+    	printf("1 - Alterar Codigo\n");
+    	printf("2 - Alterar Nome\n");
+    	printf("3 - Alterar Valor\n");
+    	printf("4 - Alterar Quant. Estoque\n");
+    	printf("Escolha uma opcao: ");
+    	scanf("%d", &iOp);
+    	switch(iOp){
+    		case 0:
+    			menuAlterar();
+    			break;
+    		case 1:
+    			system("cls || clear");
+    			alteraCodigoProduto();
+    			break;
+    		case 2:
+    			system("cls || clear");
+    			alteraNomeProduto();
+    			break;
+    		case 3:
+    			system("cls || clear");
+    			alteraValorProduto();
+    			break;
+    		case 4:
+    			system("cls || clear");
+    			alteraQtdProduto();
+    			break;
+    		default:
+    			defaultMessage();
+    			break;
+		}
+	}while(iOp != 0);
+}
+
+int alteraCodigoProduto(){
+	Produto *pAux = pProdutoInicial;
+	char cvCodigoP[51];
+	char cvNovoCod[51];
+	int iNaoEncontrado = 0;
+	
     flush_in();
-    printf("\nEntre com o nome do produto a ser alterado: ");
-    fgets(cvBNome, sizeof(cvBNome), stdin);
-    cvBNome[strcspn(cvBNome, "\n")] = '\0';
-    while (pAux != NULL)
-    {
-        if (!strcmp(pAux->cvNome, cvBNome))
-        {
-            printf("\nCodigo do Produto: ");
-            fgets(pAux->cvCodigo, sizeof(pAux->cvCodigo), stdin);
-            pAux->cvCodigo[strcspn(pAux->cvCodigo, "\n")] ='\0';
-			printf("\nNome do produto: ");
-            fgets(pAux->cvNome, sizeof(pAux->cvNome), stdin);
-            pAux->cvNome[strcspn(pAux->cvNome, "\n")] = '\0';
-            printf("\nData de Validade: ");
-            fgets(pAux->cvValidade, sizeof(pAux->cvValidade), stdin);
-            pAux->cvValidade[strcspn(pAux->cvValidade, "\n")] = '\0';
-            printf("\nValor do Produto(USAR '.' NO LUGAR DA ','): ");
-            scanf("%f", &pAux->fValor);
-            printf("\nQuantidade no Estoque(APENAS NUMEROS): ");
-        	scanf("%d", &pAux->iQtdEstoque);
-            
-            printf("\nCodigo do Fornecedor(APENAS NUMEROS): ");
-            scanf("%d", &pAux->iCodigoFornecedor);
-            iNaoEncontrado++;
-            break;
-        }
-        pAux = pAux->pProximo;
-    }
-    if (iNaoEncontrado == 0)
-    {
-        nullList();
-    }
+    printf("\nEntre com o codigo do produto a ser alterado: ");
+    fgets(cvCodigoP, sizeof(cvCodigoP), stdin);
+    cvCodigoP[strcspn(cvCodigoP, "\n")] = '\0';
+
+	
+	while(pAux != NULL){
+		if(!strcmp(pAux->cvCodigo, cvCodigoP)){
+			printf("Codigo atual: %s\tProduto: %s\n", pAux->cvCodigo, pAux->cvNome);
+			printf("Digite o novo codigo: ");
+			fgets(cvNovoCod, sizeof(cvNovoCod), stdin);
+			cvNovoCod[strcspn(cvNovoCod, "\n")] = '\0';
+			strcpy(pAux->cvCodigo, cvNovoCod);
+			iNaoEncontrado++;
+		}
+		pAux = pAux->pProximo;
+	}
+	
+	if(!iNaoEncontrado){
+		notFound("Produto");
+	}else{
+		alteradoSucesso("O codigo do produto");
+	}
+}
+
+int alteraNomeProduto(){
+	Produto *pAux = pProdutoInicial;
+	char cvCodigoP[51];
+	char cvNovoNome[201];
+	int iNaoEncontrado = 0;
+	
+	flush_in();
+    printf("\nEntre com o codigo do produto a ser alterado: ");
+    fgets(cvCodigoP, sizeof(cvCodigoP), stdin);
+    cvCodigoP[strcspn(cvCodigoP, "\n")] = '\0';
+    
+	while(pAux != NULL){
+		if(!strcmp(pAux->cvCodigo, cvCodigoP)){
+			printf("Nome atual: %s\n", pAux->cvNome);
+			printf("Digite o novo nome: ");
+			fgets(cvNovoNome, sizeof(cvNovoNome), stdin);
+			cvNovoNome[strcspn(cvNovoNome, "\n")] = '\0';
+			strcpy(pAux->cvNome,cvNovoNome);
+			iNaoEncontrado++;
+		}
+		pAux = pAux->pProximo;
+	}
+	if(!iNaoEncontrado){
+		notFound("Produto");
+	}else{
+		alteradoSucesso("O nome do produto");
+	}
+}
+
+int alteraValorProduto(){
+	Produto *pAux = pProdutoInicial;
+	char cvCodigoP[51];
+	int iNaoEncontrado = 0;
+	float fNovoValor;
+	
+	flush_in();
+    printf("\nEntre com o codigo do produto a ser alterado: ");
+    fgets(cvCodigoP, sizeof(cvCodigoP), stdin);
+    cvCodigoP[strcspn(cvCodigoP, "\n")] = '\0';
+    
+	while(pAux != NULL){
+		if(!strcmp(pAux->cvCodigo, cvCodigoP)){
+			printf("Valor atual: %.2f\tProduto: %s\n", pAux->fValor, pAux->cvNome);
+			printf("Digite o novo valor: R$ ");
+			scanf("%f", &fNovoValor);
+			pAux->fValor = fNovoValor;
+			iNaoEncontrado++;
+		}
+		pAux = pAux->pProximo;
+	}
+	if(!iNaoEncontrado){
+		notFound("Produto");
+	}else{
+		alteradoSucesso("O valor do produto");
+	}
+}
+
+int alteraQtdProduto(){
+	Produto *pAux = pProdutoInicial;
+	char cvCodigoP[51];
+	int iNaoEncontrado = 0;
+	int iNovoQtd;
+	
+	flush_in();
+    printf("\nEntre com o codigo do produto a ser alterado: ");
+    fgets(cvCodigoP, sizeof(cvCodigoP), stdin);
+    cvCodigoP[strcspn(cvCodigoP, "\n")] = '\0';
+    
+	while(pAux != NULL){
+		if(!strcmp(pAux->cvCodigo, cvCodigoP)){
+			printf("Qtd. Estoque atual: %d\tProduto: %s\n", pAux->iQtdEstoque, pAux->cvNome);
+			printf("Digite a nova quantidade: ");
+			scanf("%d", &iNovoQtd);
+			pAux->iQtdEstoque += iNovoQtd;
+			iNaoEncontrado++;
+		}
+		pAux = pAux->pProximo;
+	}
+	if(!iNaoEncontrado){
+		notFound("Produto");
+	}else{
+		alteradoSucesso("A quantidade do produto");
+	}
 }
 
 void removeProduto()
@@ -598,18 +724,18 @@ void removeProduto()
     }
     else
     {
-        char cvNomeP[201];
+        char cvCodigoP[51];
         char cvNomeTemp[200]; //Armazena o nome do item excluido temporariamente
         char cEscolha;
         int iNaoEncontrado = 0;
-        printf("Entre com o nome do produto que deseja remover: ");
+        printf("Entre com o codigo do produto que deseja remover: ");
         flush_in();
-        fgets(cvNomeP, sizeof(cvNomeP), stdin);
-        cvNomeP[strcspn(cvNomeP, "\n")] = '\0';
+        fgets(cvCodigoP, sizeof(cvCodigoP), stdin);
+        cvCodigoP[strcspn(cvCodigoP, "\n")] = '\0';
 
         while (pAux != NULL)
         {
-            if (!strcmp(pAux->cvNome, cvNomeP))
+            if (!strcmp(pAux->cvCodigo, cvCodigoP))
             {
                 if (pProdutoInicial->pProximo == NULL)
                     pProdutoInicial = NULL; // se o inicial nao tiver proximo, deve receber nulo
