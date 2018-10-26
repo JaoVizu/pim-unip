@@ -54,12 +54,7 @@ typedef struct funcionario
 
 typedef struct venda
 {
-	//int iCodProduto;
 	int iCodVenda;
-	//int iQtdProduto;
-	/*int iVeriVendaProduto;
-	int iFormaPagamento;
-	float dValTotalItem;*/
 	float dTotalCompra;
     struct Venda *vendaProximo;
 } Venda;
@@ -116,6 +111,7 @@ void listarVenda();
 /* DECLARACAO DE FUNCOES QUE RETORNAM VALOR */
 int menuPrincipal();
 int menu();
+int menuCaixa();
 int menuListar();
 int menuAlterar();
 int menuRemover();
@@ -218,6 +214,23 @@ int menu()
             break;
         default: defaultMessage(); break;
         }
+    } while (iOp != 0);
+}
+
+int menuCaixa()
+{
+    int iOp;
+    do
+    {
+        printf("\n\t\t\tMenu Caixa\n");
+    	printf("0 - Fazer Logoff\n");
+    	printf("1 - Venda\n");
+    	printf("\n Escolha a opcao desejada: ");
+    	scanf("%d", &iOp);
+    	switch(iOp){
+    		case 0: VerificarLogin(); break;
+    		case 1: venda(); break;
+		}
     } while (iOp != 0);
 }
 
@@ -452,7 +465,9 @@ void VerificarLogin()
     char cvAcessoSenha[07];
     int iQtdCaracter;
     int iSenhaIgual = 0;
-    do
+    char *t="SEJA BEM VINDO, FACA SEU LOGIN!!";
+	tela(t);
+	do
     {
         printf("\nEntre com o login: ");
         fflush(stdin); //Limpando o buffer do teclado
@@ -481,11 +496,19 @@ void VerificarLogin()
         while (fAux != NULL)
         {
             if( (!strcmp(fAux->cvLogin, cvAcessoLogin)) && (!strcmp(fAux->cvSenha,cvAcessoSenha))){
-                system("cls || clear");
-                printf("\n\n\t\t\tBEM-VINDO %s... \n", fAux->cvNomeFunc);
-                printf("\t\t\tVoce esta operando como: %s \n\n", fAux->cvCargo);
-                iSenhaIgual = 1;
-                menu();
+                if(!strcmp(fAux->cvCargo, "ADMINISTRADOR")){
+					system("cls || clear");
+	                printf("\n\n\t\t\tBEM-VINDO %s... \n", fAux->cvNomeFunc);
+	                printf("\t\t\tVoce esta operando como: %s \n\n", fAux->cvCargo);
+	                iSenhaIgual = 1;
+	                menu();
+				}else{
+					system("cls || clear");
+	                printf("\n\n\t\t\tBEM-VINDO %s... \n", fAux->cvNomeFunc);
+	                printf("\t\t\tVoce esta operando como: %s \n\n", fAux->cvCargo);
+	                iSenhaIgual = 1;
+	                menuCaixa();
+				}
             }
             fAux = fAux->funProximo;
         }
