@@ -171,7 +171,7 @@ void nullDelete(){
 char escolhaRegistro(){
     char cEscolha = 's';
     do{
-    	printf("Deseja cadastrar um novo registro?(s/n) \n");
+    	printf("\nDeseja cadastrar um novo registro?(s/n) \n");
     	scanf(" %c", &cEscolha);
     	if(cEscolha == 's' || cEscolha == 'n') break;
 	}while(cEscolha != 's' || cEscolha != 'n');
@@ -228,7 +228,7 @@ int menuCadastro()
     do
     {
         printf("\n\t\t\tMENU CADASTRO\n");
-        printf("\n0- sair");
+        printf("\n0- Sair");
         printf("\n1- Cadastrar Funcionario");
         printf("\n2- Cadastrar Cliente");
         printf("\n3- Cadastrar Produto");
@@ -289,6 +289,7 @@ int menuListar(){
             case 2: listarCliente();break;
             case 3: listarProdutos();break;
             case 4: listarFornecedor();break;
+            default: defaultMessage();break;
         }
     }while(iOp != 0);
 }
@@ -1092,7 +1093,7 @@ int cadastrarFuncionario(){
         printf("\nNome: ");
         fgets(fNovoFuncionario->cvNomeFunc, sizeof(fNovoFuncionario->cvNomeFunc), stdin);
         fNovoFuncionario->cvNomeFunc[strcspn(fNovoFuncionario->cvNomeFunc, "\n")] = '\0';
-        strcpy(fNovoFuncionario->cvCargo, "GERENTE");
+        strcpy(fNovoFuncionario->cvCargo, "ADMINISTRADOR");
 		CadastroLogin(fNovoFuncionario->cvLogin, fNovoFuncionario->cvSenha);
 
         if(fFuncionarioInicial == NULL) {
@@ -1136,11 +1137,11 @@ int cadastrarFuncionario(){
 	        fNovoFuncionario->cvNomeFunc[strcspn(fNovoFuncionario->cvNomeFunc, "\n")] = '\0';
 	        do{
 				printf("\nCargo: ");
-		        printf("\n1: GERENTE \n2: CAIXA \n3: FINANCEIRO\n");
+		        printf("\n1: ADMINISTRADOR \n2: CAIXA \n3: FINANCEIRO\n");
 		        scanf("%d",&op);
 		        switch(op){
 		        	case 1: 
-						strcpy(fNovoFuncionario->cvCargo, "GERENTE");
+						strcpy(fNovoFuncionario->cvCargo, "ADMINISTRADOR");
 		        		fNovoFuncionario->cvCargo[strcspn(fNovoFuncionario->cvCargo, "\n")] = '\0';
 					break;
 		        	case 2: 
@@ -1189,7 +1190,7 @@ int cadastrarFuncionario(){
 	        }
 	
 	        cEscolha = escolhaRegistro();
-	        system("cls || clear");
+	        
 	    }while(cEscolha != 'n');
 	}
 }
@@ -1234,12 +1235,12 @@ void alteraFuncionario()
             do
             {
                 printf("\nCargo: ");
-                printf("\n1: GERENTE \n2: CAIXA \n3: FINANCEIRO\n");
+                printf("\n1: ADMINISTRADOR \n2: CAIXA \n3: FINANCEIRO\n");
                 scanf("%d", &iOp);
                 switch (iOp)
                 {
                 case 1:
-                    strcpy(fAux->cvCargo, "GERENTE");
+                    strcpy(fAux->cvCargo, "ADMINISTRADOR");
                     fAux->cvCargo[strcspn(fAux->cvCargo, "\n")] = '\0';
                     break;
                 case 2:
@@ -1379,7 +1380,7 @@ int venda(){
 	do{
 		//laco para itemVenda
 		do{
-			//flush_in();
+			fflush(stdin);
 			ItemVenda *iNovoItem = (ItemVenda*) malloc(sizeof(ItemVenda));
 			iNovoItem->iItemProximo = NULL;
 			printf("\n\nEntre com o codigo do produto: ");
