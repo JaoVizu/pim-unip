@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 typedef struct produto
 {
     char cvNome[500];
@@ -54,6 +55,9 @@ typedef struct funcionario
 
 typedef struct venda
 {
+	int iDia;
+	int iMes;
+	int iAno;
 	int iCodVenda;
 	float dTotalCompra;
     struct Venda *vendaProximo;
@@ -107,6 +111,7 @@ void CadastroLogin(char cvCadastroLogin[],char cvCadastroSenha[]);
 void VerificarLogin();
 void tela(char tela[]);
 void listarVenda();
+void listaItemVenda();
 
 /* DECLARACAO DE FUNCOES QUE RETORNAM VALOR */
 int menuPrincipal();
@@ -128,6 +133,8 @@ int cadastrarFuncionario();
 int venda();
 int verificaCliente(char cvNome[]);
 
+/* CHAR FUNCTIONS */
+char pegaValorProd();
 
 int main(){
 	cadastrarFuncionario();
@@ -540,6 +547,7 @@ int cadastrarProduto(){
         pNovoProduto->cvValidade[strcspn(pNovoProduto->cvValidade, "\n")] = '\0';
         printf("\nValor do Produto(USAR '.' NO LUGAR DA ','): ");
         scanf("%f", &pNovoProduto->fValor);
+        //pNovoProduto->fValor = pegaValorProd();
         printf("\nQuantidade no Estoque(APENAS NUMEROS): ");
         scanf("%d", &pNovoProduto->iQtdEstoque);
         printf("\nCodigo do Fornecedor(APENAS NUMEROS): ");
@@ -561,6 +569,71 @@ int cadastrarProduto(){
         
         system("cls || clear");
     }while(cEscolha != 'n');
+}
+
+char pegaValorProd(){
+	char cCaracter;
+  	int iMax=100;
+    char data[iMax],c[iMax];
+    int iQtdCaracter=0, x=0, z, w;
+    char cPonto = 46;
+    float fValor = 0;
+        
+        do
+        {
+        	if(x<iMax){
+        		c[x]='\b';
+        		x++;
+			}
+            cCaracter = getch();
+            if (isprint(cCaracter))
+            { //Analisa se o valor de c � imprim�vel
+                iQtdCaracter++;
+                if(iQtdCaracter==1){
+                	data[0] = 48;
+                	data[1]=46;
+                	data[2]=48;
+                	data[3]=cCaracter;
+                printf("%s",data); //Imprimindo apenas o asterisco *
+			}else if(iQtdCaracter==2){
+				printf("\b\b\b\b");
+					data[0] = 48;
+					data[1] = 46;
+                	data[2]=data[3];
+                	data[3]=cCaracter;
+                printf("%s",data); //Imprimindo apenas o asterisco *
+			}else if(iQtdCaracter==3){
+				printf("\b\b\b\b");
+					data[0] = data[2];
+					data[1] = 46;
+                	data[2]=data[3];
+                	data[3]=cCaracter;
+                printf("%s",data); //Imprimindo apenas o asterisco *
+              // printf("\n%d",w);
+        }else if(iQtdCaracter>3){
+        	z=iQtdCaracter-2;
+        	w=iQtdCaracter-3;
+			printf("%s",c);
+			//numero antes do ponto final
+			data[w]=data[z];
+			//ponto final
+			data[z]=46;
+			data[x]=cCaracter;
+            printf("%s",data); //Imprimindo apenas o asterisco *
+			}
+            }else if (cCaracter == 8 && iQtdCaracter)
+            {
+                data[iQtdCaracter] = '\0';
+                iQtdCaracter--;
+                x--;
+                printf("\b \b"); //Apagando os caracteres digitados
+			}
+        } while (cCaracter != 13); //13 � o valor de ENTER na tabela ASCII
+        iQtdCaracter+=1;
+        data[iQtdCaracter] = '\0';
+        //printf("\n%s",data);
+        fValor = atof(data);
+        return fValor;
 }
 
 void listarProdutos(){
@@ -1376,6 +1449,7 @@ int venda(){
 	int iNaoEncontrado = 0;
 	int iQuantidade = 0;
 	float fDinheiroRecebido = 0;
+	float totalItem = 0;
 	float totalVenda = 0;
 	//desconto para clientes
 	fflush(stdin);
@@ -1417,7 +1491,7 @@ int venda(){
 					printf("\n**************************************************\nProduto: %s\t Vl. Unitario: R$ %.2f\n**************************************************\n", pAux->cvNome, pAux->fValor);
 					printf("Entre com a quantidade de compra: ");
 					scanf("%d", &iQuantidade);
-					iNovoItem->fValorItem = pAux->fValor * iQuantidade;
+					iNovoItem->fValorItem = pAux->fValor * iQuantidade;;
 					pAux->iQtdEstoque -= iQuantidade;
 					totalVenda += iNovoItem->fValorItem;
 					//colocando item na struct
@@ -1435,29 +1509,36 @@ int venda(){
 				}
 				pAux = pAux->pProximo;
 			}//fim while produto
-			printf("Total: R$ %.2f\n", totalVenda);
+			printf("Total Produto: R$ %.2f\n", iNovoItem->fValorItem);
 			printf("Finalizar items? (s)");
 			scanf(" %c", &cFinalizar);
 			system("cls || clear");
 		}while(cFinalizar != 's');
 		
 		//colocar na struct de venda
+		srand(time(NULL));
+		time_t t = time(NULL);
+		struct tm tm = *localtime(&t);
+		
 		Venda *vNovaVenda = (Venda*) malloc(sizeof(Venda));
 		vNovaVenda->vendaProximo = NULL;
 		
 		//jogando valores para a nova venda
-		vNovaVenda->iCodVenda++;
+		vNovaVenda->iCodVenda = rand() % 900;
 		vNovaVenda->dTotalCompra = totalVenda;
-		
-		printf("Valor da compra: R$ %.2f\n", vNovaVenda->dTotalCompra);
+		vNovaVenda->iDia = tm.tm_mday;
+		vNovaVenda->iMes = tm.tm_mon + 1;
+		vNovaVenda->iAno = tm.tm_year + 1900;
+		listaItemVenda();
+		printf("Valor Total: R$ %.2f\n", vNovaVenda->dTotalCompra);
 		//adm podera alterar
 		if(iVerificaCli){
 			if(vNovaVenda->dTotalCompra >= 50){
 				vNovaVenda->dTotalCompra = vNovaVenda->dTotalCompra - (vNovaVenda->dTotalCompra * 0.05);
-				printf("Valor com desconto: R$ %.2f\n", vNovaVenda->dTotalCompra);	
+				printf("\nValor com desconto: R$ %.2f\n", vNovaVenda->dTotalCompra);	
 			}else if(vNovaVenda->dTotalCompra >= 100){
 				vNovaVenda->dTotalCompra = vNovaVenda->dTotalCompra - (vNovaVenda->dTotalCompra * 0.10);
-				printf("Valor com desconto: R$ %.2f\n", vNovaVenda->dTotalCompra);	
+				printf("\nValor com desconto: R$ %.2f\n", vNovaVenda->dTotalCompra);	
 			}
 			
 		}
@@ -1504,9 +1585,20 @@ void listarVenda(){
 	
 	Venda *vAux = vVendaInicial;
 	while(vAux != NULL){
-		printf("Codigo Venda: %d\t Total da Venda: R$%.2f\n", vAux->iCodVenda, vAux->dTotalCompra);
+		printf("Data: %d/%d/%d\tCodigo Venda: %d\t\t Total da Venda: R$%.2f\n", vAux->iDia, vAux->iMes, vAux->iAno,vAux->iCodVenda, vAux->dTotalCompra);
 		vAux = vAux->vendaProximo;
 	}
+}
+
+void listaItemVenda(){
+	ItemVenda *iAux = iItemVendaInicial;
+	printf("\t\t\tProdutos Comprados\n");
+	printf("\t\t\t************************************************************\n");
+	while(iAux != NULL){
+		printf("\t\t\tNome Produto: %s\t Valor: %.2f\n", iAux->cvNomeItem, iAux->fValorItem);
+		iAux = iAux->iItemProximo;
+	}
+	printf("\t\t\t************************************************************\n");
 }
 
 int verificaCliente(char cvNome[]){
@@ -1527,6 +1619,8 @@ int verificaCliente(char cvNome[]){
 	}
 	
 }
+
+
 
 //Limpa buffer do teclado
 void flush_in()
