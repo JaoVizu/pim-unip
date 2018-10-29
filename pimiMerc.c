@@ -120,6 +120,7 @@ int menuCaixa();
 int menuListar();
 int menuAlterar();
 int menuRemover();
+void menuVenda();
 char escolhaRegistro();
 int menuCadastro();
 int cadastrarProduto();
@@ -131,10 +132,11 @@ int cadastrarFornecedor();
 int cadastrarCliente();
 int cadastrarFuncionario();
 int venda();
+int pesqVendaData();
 int verificaCliente(char cvNome[]);
 
 /* CHAR FUNCTIONS */
-char pegaValorProd();
+float pegaValorProd();
 
 int main(){
 	cadastrarFuncionario();
@@ -165,7 +167,7 @@ void nullList(){
     printf("\nNao ha registros para serem listados!!!\n");
 }
 void notFound(char cvName[]){
-	printf("\n%s nao encontrado!", cvName);
+	printf("\n%s nao encontrado(a)!", cvName);
 }
 void nullDelete(){
     printf("\nNao ha registros para serem removidos!!\n");
@@ -190,7 +192,8 @@ int menuPrincipal()
     printf(" 0- Fazer Logof\n");
     printf(" 1- Cadastros\n");
     printf(" 2- Caixa\n");
-    printf(" 3- Estoque\n");
+    printf(" 3- Controle de Vendas\n");
+    printf(" 4- Estoque\n");
     printf("\n Escolha a opcao desejada: ");
     scanf("%d", &iOp);
     return iOp;
@@ -217,7 +220,8 @@ int menu()
 			venda();
             break;
         case 3:
-            printf("\n Iniciando Estoque...\n");
+            system("cls || clear");
+            menuVenda();
             break;
         default: defaultMessage(); break;
         }
@@ -388,6 +392,26 @@ int menuRemover(){
         		break;
 		}
 	}while(iOp < 0 || iOp > 4);
+}
+
+
+void menuVenda(){
+	int iDia, iMes, iAno;
+	int iOp;
+	do{
+		printf("\n\t\tVendas\n");
+		printf("0 - Sair\n");
+		printf("1 - Listar todas as vendas\n");
+		printf("2 - Pesquisar Venda por Data\n");
+		printf("Entre com a opcao desejada: ");
+		scanf("%d", &iOp);
+		switch(iOp){
+			case 0: system("cls || clear"); break;
+			case 1: listarVenda(); break;
+			case 2: pesqVendaData();break;
+			default: defaultMessage();break;
+		}
+	}while(iOp != 0);
 }
 
 void tela(char tela[])
@@ -571,13 +595,13 @@ int cadastrarProduto(){
     }while(cEscolha != 'n');
 }
 
-char pegaValorProd(){
+float pegaValorProd(){
 	char cCaracter;
   	int iMax=100;
     char data[iMax],c[iMax];
     int iQtdCaracter=0, x=0, z, w;
-    char cPonto = 46;
-    float fValor = 0;
+    char cPonto = '.';
+    float fValor;
         
         do
         {
@@ -590,22 +614,22 @@ char pegaValorProd(){
             { //Analisa se o valor de c � imprim�vel
                 iQtdCaracter++;
                 if(iQtdCaracter==1){
-                	data[0] = 48;
-                	data[1]=46;
-                	data[2]=48;
+                	data[0] = '0';
+                	data[1]='.';
+                	data[2]='0';
                 	data[3]=cCaracter;
                 printf("%s",data); //Imprimindo apenas o asterisco *
 			}else if(iQtdCaracter==2){
 				printf("\b\b\b\b");
-					data[0] = 48;
-					data[1] = 46;
+					data[0] = '0';
+					data[1] = '.';
                 	data[2]=data[3];
                 	data[3]=cCaracter;
                 printf("%s",data); //Imprimindo apenas o asterisco *
 			}else if(iQtdCaracter==3){
 				printf("\b\b\b\b");
 					data[0] = data[2];
-					data[1] = 46;
+					data[1] = '.';
                 	data[2]=data[3];
                 	data[3]=cCaracter;
                 printf("%s",data); //Imprimindo apenas o asterisco *
@@ -617,7 +641,7 @@ char pegaValorProd(){
 			//numero antes do ponto final
 			data[w]=data[z];
 			//ponto final
-			data[z]=46;
+			data[z]='.';
 			data[x]=cCaracter;
             printf("%s",data); //Imprimindo apenas o asterisco *
 			}
@@ -1575,7 +1599,6 @@ int venda(){
 		printf("Finalizar venda? (s)\n");
 		scanf(" %c", &cFinalizar);	
 	}while(cFinalizar != 's');
-	listarVenda();
 	//limpar item venda
 	iItemVendaInicial = NULL;
 	return 0;	
@@ -1589,6 +1612,27 @@ void listarVenda(){
 		vAux = vAux->vendaProximo;
 	}
 }
+
+int pesqVendaData(){
+	int iDia, iMes, iAno;
+	int iNaoEncontrado = 0;
+	printf("Entre com a data desejada: ");
+	scanf("%d/%d/%d", &iDia, &iMes, &iAno);
+	//printf("Data: %d/%d/%d\n", iDia, iMes, iAno);
+	Venda *vAux = vVendaInicial;
+	while(vAux != NULL){
+		if((vAux->iDia == iDia) && (vAux->iMes == iMes) && (vAux->iAno == iAno)){
+			printf("Data: %d/%d/%d\tCodigo Venda: %d\t\t Total da Venda: R$%.2f\n", vAux->iDia, vAux->iMes, vAux->iAno,vAux->iCodVenda, vAux->dTotalCompra);
+			iNaoEncontrado++;
+		}
+		vAux = vAux->vendaProximo;
+	}
+	
+	if(!iNaoEncontrado){
+		notFound("Venda");
+	}
+}
+
 
 void listaItemVenda(){
 	ItemVenda *iAux = iItemVendaInicial;
