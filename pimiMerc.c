@@ -8,6 +8,7 @@ typedef struct produto
     char cvValidade[100];
     float fValor;
     int iQtdEstoque;
+    int iEstoqSeguranca;
     char cvCodigo[50];
     int iCodigoFornecedor;
     struct Produto *pProximo;
@@ -78,6 +79,7 @@ Venda *vVendaInicial = NULL;
 ItemVenda *iItemVendaInicial = NULL;
 int iAdm = 0;
 
+
 /**
  * 
  * AS FUNCOES DE REMOVER ESTAO REMOVENDO SEMPRE O PRIMEIRO ELEMENTO DA LISTA
@@ -85,7 +87,6 @@ int iAdm = 0;
  * DE ACORDO COM O CODIGO OU NOME
  * 
 */
-
 /* DECLARACAO DE  FUNCOES */
 void sair();
 void defaultMessage();
@@ -106,12 +107,13 @@ void removeCliente();
 void listarFuncionario();
 void alteraFuncionario();
 void removeFuncionario();
-void flush_in();
 void CadastroLogin(char cvCadastroLogin[],char cvCadastroSenha[]);
 void VerificarLogin();
 void tela(char tela[]);
 void listarVenda();
 void listaItemVenda();
+
+void verificaEstoqueSegurancao();
 
 /* DECLARACAO DE FUNCOES QUE RETORNAM VALOR */
 int menuPrincipal();
@@ -128,6 +130,7 @@ int alteraCodigoProduto();
 int alteraNomeProduto();
 int alteraValorProduto();
 int alteraQtdProduto();
+int alteraEstoqueSeg();
 int cadastrarFornecedor();
 int cadastrarCliente();
 int cadastrarFuncionario();
@@ -137,8 +140,18 @@ int verificaCliente(char cvNome[]);
 
 /* CHAR FUNCTIONS */
 float pegaValorProd();
+int FormatarData();
+int FormatarTelefone();
+int FormatarCelular();
+int FormatarCPF();
+int Nome();
+
+/* Arquivos Functions */
+int gravarProduto();
+int lerProduto();
 
 int main(){
+	
 	cadastrarFuncionario();
     return 0;
 }
@@ -178,17 +191,39 @@ char escolhaRegistro(){
     do{
     	printf("\nDeseja cadastrar um novo registro?(s/n) \n");
     	scanf(" %c", &cEscolha);
-    	if(cEscolha == 's' || cEscolha == 'n') break;
-	}while(cEscolha != 's' || cEscolha != 'n');
+    	if(cEscolha == 's' || cEscolha == 'S' || cEscolha == 'n' || cEscolha == 'N') break;
+	}while(cEscolha != 's' || cEscolha == 'S' || cEscolha != 'n' || cEscolha == 'N');
  
     return cEscolha;
 }
 
+void verificaEstoqueSegurancao(){
+	Produto *pAux = pProdutoInicial;
+	while(pAux != NULL){
+		if(pAux->iQtdEstoque < pAux->iEstoqSeguranca){
+			 printf("\n\n================================================================================================================================================================================================================================================\n");
+			printf("%s precisa que seu estoque seja reabastecido!!!\n", pAux->cvNome);
+			 printf("================================================================================================================================================================================================================================================\n\n");
+		}
+		pAux = pAux->pProximo;
+	}
+}
+
 int menuPrincipal()
-{
-	
+{	
     int iOp;
-    printf("\n\t\t\tMenu\n");
+     Funcionario *fAux = fFuncionarioInicial;
+    system("cls || clear");
+	                printf("================================================================================================================================================================================================================================================");
+   					printf("\t   2vjmig\n\n");
+    				printf("\t\t\t\t*********************************************\n");
+    				printf("\t\t\t\t\t\t   MENU\n");
+    				printf("\t\t\t\t*********************************************\n");
+	                printf("   %s: ", fAux->cvCargo);
+	                printf("%s ", fAux->cvNomeFunc);
+    				printf("\n\t\t\t\t\t\t\t\t\t\t\t\t\tiMerc.vs2018\n");
+    				printf("================================================================================================================================================================================================================================================\n"); 
+	verificaEstoqueSegurancao();    				
     printf(" 0- Fazer Logof\n");
     printf(" 1- Cadastros\n");
     printf(" 2- Caixa\n");
@@ -209,6 +244,8 @@ int menu()
         {
         case 0:
         	system("cls || clear");
+        	//struct para arquivo
+			gravarProduto();
             VerificarLogin();
             break;
         case 1:
@@ -233,7 +270,18 @@ int menuCaixa()
     int iOp;
     do
     {
-        printf("\n\t\t\tMenu Caixa\n");
+         Funcionario *fAux = fFuncionarioInicial;
+    system("cls || clear");
+	                printf("================================================================================================================================================================================================================================================");
+   					printf("\t   2vjmig\n\n");
+    				printf("\t\t\t\t*********************************************\n");
+    				printf("\t\t\t\t\t\t   MENU\n");
+    				printf("\t\t\t\t*********************************************\n");
+	                printf("   %s: ", fAux->cvCargo);
+	                printf("%s ", fAux->cvNomeFunc);
+    				printf("\n\t\t\t\t\t\t\t\t\t\t\t\t\tiMerc.vs2018\n");
+    				printf("================================================================================================================================================================================================================================================\n"); 
+    
     	printf("0 - Fazer Logoff\n");
     	printf("1 - Venda\n");
     	printf("\n Escolha a opcao desejada: ");
@@ -247,12 +295,11 @@ int menuCaixa()
 
 int menuCadastro()
 {
-	system("cls || clear");
     int iOp;
     do
     {
-        printf("\n\t\t\tMENU CADASTRO\n");
-        printf("\n0- Sair");
+    	tela("\t    MENU CADASTROS");
+        printf("\n0- Voltar");
         printf("\n1- Cadastrar Funcionario");
         printf("\n2- Cadastrar Cliente");
         printf("\n3- Cadastrar Produto");
@@ -280,6 +327,7 @@ int menuCadastro()
             cadastrarFornecedor();
             break;
         case 5:
+        	lerProduto();
             menuListar();
             break;
         case 6:
@@ -296,11 +344,10 @@ int menuCadastro()
 }
 
 int menuListar(){
-    system("cls || clear");
     int iOp;
     do{
-        printf("\n\t\t\tListar\n");
-        printf("\n0 - Sair");
+        tela("\t    LISTAR CADASTROS");
+        printf("\n0 - Voltar");
         printf("\n1- Listar Funcionario");
         printf("\n2- Listar Clientes");
         printf("\n3- Listar Produto");
@@ -320,12 +367,11 @@ int menuListar(){
 
 int menuAlterar()
 {
-    system("cls || clear");
     int iOp;
     do
     {
-        printf("\n\t\t\Alterar\n");
-        printf("\n0 - Sair");
+        tela("\t    ALTERAR CADASTROS");
+        printf("\n0 - Voltar");
         printf("\n1- Alterar Funcionario");
         printf("\n2- Alterar Clientes");
         printf("\n3- Alterar Produto");
@@ -359,12 +405,11 @@ int menuAlterar()
 }
 
 int menuRemover(){
-	system("cls || clear");
 	int iOp;
 	
 	do{
-		printf("\n\t\t\Alterar\n");
-        printf("\n0 - Sair");
+		tela("\t    REMOVER CADASTROS");
+        printf("\n0 - Voltar");
         printf("\n1- Remover Funcionario");
         printf("\n2- Remover Clientes");
         printf("\n3- Remover Produto");
@@ -400,7 +445,7 @@ void menuVenda(){
 	int iOp;
 	do{
 		printf("\n\t\tVendas\n");
-		printf("0 - Sair\n");
+		printf("0 - Voltar\n");
 		printf("1 - Listar todas as vendas\n");
 		printf("2 - Pesquisar Venda por Data\n");
 		printf("Entre com a opcao desejada: ");
@@ -416,10 +461,13 @@ void menuVenda(){
 
 void tela(char tela[])
 {
+	system("cls || clear");
     printf("================================================================================================================================================================================================================================================");
-    printf("\t2vjmig\n\n");
+    printf("\t\t2vjmig\n\n");
+    printf("\t\t\t\t*******************************************************\n");
     printf("\t\t\t\t\t%s\n", tela);
-    printf("\n\t\t\t\t\t\t\t\t\t\t\t\t\t\tiMerc.vs2018\n");
+    printf("\t\t\t\t*******************************************************\n");
+    printf("\n\t\t\t\t\t\t\t\t\t\t\t\t\tiMerc.vs2018\n");
     printf("================================================================================================================================================================================================================================================\n");
 }
 
@@ -428,16 +476,17 @@ void CadastroLogin(char cvCadastroLogin[], char cvCadastroSenha[])
     char cCaracter;
     char cvSenhaIgual[07];
     int iQtdCaracter;
-    int iSenhaIgual = 0;
+    int iSenhaIgual = 0, z = 0;
     do
     {
         printf("\nDigite o login: ");
         fflush(stdin); //Limpando o buffer do teclado
-        gets(cvCadastroLogin);
+        strcpy(cvCadastroLogin,Nome());
         printf("\nDigite a senha: ");
         iQtdCaracter = 0;
         do
-        {
+        { 
+			z=0;
             cCaracter = getch();
             if (isprint(cCaracter) && (iQtdCaracter != 6))
             {                                              //Analisa se o valor da vari�vel c � imprimivel
@@ -450,12 +499,15 @@ void CadastroLogin(char cvCadastroLogin[], char cvCadastroSenha[])
                 cvCadastroSenha[iQtdCaracter] = '\0';
                 iQtdCaracter--;
                 printf("\b \b"); //Apagando o caractere digitado
-            }
-        } while (cCaracter != 13); //13 � o valor de ENTER na tabela ASCII
+            }else if(cCaracter==13 && iQtdCaracter!=0){
+            	z=1;
+			}
+        } while (z != 1); //13 � o valor de ENTER na tabela ASCII
         cvCadastroSenha[iQtdCaracter] = '\0';
 
         printf("\nConfirmacao da senha: ");
         iQtdCaracter = 0;
+        z = 0;
         do
         {
             cCaracter = getch();
@@ -470,8 +522,10 @@ void CadastroLogin(char cvCadastroLogin[], char cvCadastroSenha[])
                 cvSenhaIgual[iQtdCaracter] = '\0';
                 iQtdCaracter--;
                 printf("\b \b"); //Apagando os caracteres digitados
-            }
-        } while (cCaracter != 13); //13 � o valor de ENTER na tabela ASCII
+            }else if(cCaracter==13 && iQtdCaracter!=0){
+            	z=1;
+			}
+        } while (z != 1); //13 � o valor de ENTER na tabela ASCII
         cvSenhaIgual[iQtdCaracter] = '\0';
 
         if (!strcmp(cvCadastroSenha, cvSenhaIgual))
@@ -483,7 +537,6 @@ void CadastroLogin(char cvCadastroLogin[], char cvCadastroSenha[])
         }
         else
         {
-            system("cls||clear");
             printf("\n\n\t\a\tSENHAS DIFERENTES - DIGITE NOVAMENTE...\n\n");
         }
     } while (iSenhaIgual != 1); //Enquanto b e d forem diferente de zero 0
@@ -495,14 +548,14 @@ void VerificarLogin()
     char cvAcessoLogin[50];
     char cvAcessoSenha[07];
     int iQtdCaracter;
-    int iSenhaIgual = 0;
+    int iSenhaIgual = 0, z = 0;
     char *t="SEJA BEM VINDO, FACA SEU LOGIN!!";
 	tela(t);
 	do
     {
         printf("\nEntre com o login: ");
         fflush(stdin); //Limpando o buffer do teclado
-        gets(cvAcessoLogin);
+        strcpy(cvAcessoLogin,Nome());
         printf("\nEntre com a senha: ");
         iQtdCaracter = 0;
         do
@@ -519,8 +572,10 @@ void VerificarLogin()
                 cvAcessoSenha[iQtdCaracter] = '\0';
                 iQtdCaracter--;
                 printf("\b \b"); //Apagando os caracteres digitados
-            }
-        } while (cCaracter != 13); //13 � o valor de ENTER na tabela ASCII
+            }else if(cCaracter==13 && iQtdCaracter!=0){
+            	z=1;
+			}
+        } while (z != 1); //13 � o valor de ENTER na tabela ASCII
         cvAcessoSenha[iQtdCaracter] = '\0';
 
         Funcionario *fAux = fFuncionarioInicial;
@@ -528,55 +583,49 @@ void VerificarLogin()
         {
             if( (!strcmp(fAux->cvLogin, cvAcessoLogin)) && (!strcmp(fAux->cvSenha,cvAcessoSenha))){
                 if(!strcmp(fAux->cvCargo, "ADMINISTRADOR")){
-					system("cls || clear");
-	                printf("\n\n\t\t\tBEM-VINDO %s... \n", fAux->cvNomeFunc);
-	                printf("\t\t\tVoce esta operando como: %s \n\n", fAux->cvCargo);
 	                iSenhaIgual = 1;
 	                menu();
-				}else{
-					system("cls || clear");
-	                printf("\n\n\t\t\tBEM-VINDO %s... \n", fAux->cvNomeFunc);
-	                printf("\t\t\tVoce esta operando como: %s \n\n", fAux->cvCargo);
+				}else if(!strcmp(fAux->cvCargo, "CAIXA")){
 	                iSenhaIgual = 1;
 	                menuCaixa();
+				}else{
+				iSenhaIgual = 1;
+				printf("financeiro");
+	            //menuCaixa();	
 				}
             }
             fAux = fAux->funProximo;
         }
         
         if(iSenhaIgual == 0){
-        	system("cls || clear");
-        	printf("\n\n\t\t\tUsuario nao cadastrado... Tente Novamente! \n\n");
+        	printf("\n\n\t\t\tUSUARIO NAO CADASTRADO... TENTE NOVAMENTE! \n\n");
 		}
 	
     } while (iSenhaIgual != 1);
 }
 
 int cadastrarProduto(){
-    system("cls || clear");
-    printf("\n\t\t\tCadastro de produtos\n");
+        tela("\tCADASTRO DE PRODUTO");
     char cEscolha;
     do{
         Produto *pNovoProduto = (Produto*) malloc(sizeof(Produto));
         pNovoProduto->pProximo = NULL;
-		flush_in();
+		fflush(stdin);
 		printf("\nCodigo do Produto: ");
-        fgets(pNovoProduto->cvCodigo, sizeof(pNovoProduto->cvCodigo), stdin);
-        pNovoProduto->cvCodigo[strcspn(pNovoProduto->cvCodigo, "\n")] = '\0';
+        strcpy(pNovoProduto->cvCodigo,Nome());
         printf("\nNome do produto: ");
-        fgets(pNovoProduto->cvNome, sizeof(pNovoProduto->cvNome), stdin);
-        pNovoProduto->cvNome[strcspn(pNovoProduto->cvNome, "\n")] = '\0';
+        strcpy(pNovoProduto->cvNome,Nome());
         printf("\nData de Validade: ");
-        fgets(pNovoProduto->cvValidade, sizeof(pNovoProduto->cvValidade), stdin);
-        pNovoProduto->cvValidade[strcspn(pNovoProduto->cvValidade, "\n")] = '\0';
-        printf("\nValor do Produto(USAR '.' NO LUGAR DA ','): ");
-        scanf("%f", &pNovoProduto->fValor);
-        //pNovoProduto->fValor = pegaValorProd();
+        strcpy(pNovoProduto->cvValidade, FormatarData());
+        printf("\nValor do Produto: ");
+        pNovoProduto->fValor = pegaValorProd();
         printf("\nQuantidade no Estoque(APENAS NUMEROS): ");
         scanf("%d", &pNovoProduto->iQtdEstoque);
+        printf("\nEstoque de Seguranca(APENAS NUMEROS): ");
+        scanf("%d", &pNovoProduto->iEstoqSeguranca);
         printf("\nCodigo do Fornecedor(APENAS NUMEROS): ");
         scanf("%d", &pNovoProduto->iCodigoFornecedor);
-        flush_in();
+        fflush(stdin);
 
         if(pProdutoInicial == NULL){
             pProdutoInicial = pNovoProduto;
@@ -598,71 +647,277 @@ int cadastrarProduto(){
 float pegaValorProd(){
 	char cCaracter;
   	int iMax=100;
-    char data[iMax],c[iMax];
+    char cValor[iMax],c[iMax];
     int iQtdCaracter=0, x=0, z, w;
-    char cPonto = '.';
-    float fValor;
+    char cPonto = 46;
+    float fValor = 0;
         
         do
         {
+        	fflush(stdin);
         	if(x<iMax){
         		c[x]='\b';
         		x++;
 			}
             cCaracter = getch();
             if (isprint(cCaracter))
-            { //Analisa se o valor de c � imprim�vel
+            { //Analisa se o valor de c ? imprim?vel
+            if(cCaracter=='0'|| cCaracter=='1'|| cCaracter=='2'||cCaracter=='3' || cCaracter=='4'||cCaracter=='5' || cCaracter=='6'||cCaracter=='7' || cCaracter=='8'||cCaracter=='9'){
                 iQtdCaracter++;
                 if(iQtdCaracter==1){
-                	data[0] = '0';
-                	data[1]='.';
-                	data[2]='0';
-                	data[3]=cCaracter;
-                printf("%s",data); //Imprimindo apenas o asterisco *
+                	cValor[0] = 48;
+                	cValor[1]=46;
+                	cValor[2]=48;
+                	cValor[3]=cCaracter;
+                printf("%s",cValor); //Imprimindo valor
 			}else if(iQtdCaracter==2){
 				printf("\b\b\b\b");
-					data[0] = '0';
-					data[1] = '.';
-                	data[2]=data[3];
-                	data[3]=cCaracter;
-                printf("%s",data); //Imprimindo apenas o asterisco *
+					cValor[0] = 48;
+					cValor[1] = 46;
+                	cValor[2]=cValor[3];
+                	cValor[3]=cCaracter;
+                printf("%s",cValor); //Imprimindo valor*
 			}else if(iQtdCaracter==3){
 				printf("\b\b\b\b");
-					data[0] = data[2];
-					data[1] = '.';
-                	data[2]=data[3];
-                	data[3]=cCaracter;
-                printf("%s",data); //Imprimindo apenas o asterisco *
-              // printf("\n%d",w);
+					cValor[0] = cValor[2];
+					cValor[1] = 46;
+                	cValor[2]=cValor[3];
+                	cValor[3]=cCaracter;
+                printf("%s",cValor); //Imprimindo valor *
         }else if(iQtdCaracter>3){
         	z=iQtdCaracter-2;
         	w=iQtdCaracter-3;
 			printf("%s",c);
 			//numero antes do ponto final
-			data[w]=data[z];
+			cValor[w]=cValor[z];
 			//ponto final
-			data[z]='.';
-			data[x]=cCaracter;
-            printf("%s",data); //Imprimindo apenas o asterisco *
+			cValor[z]=46;
+			cValor[x]=cCaracter;
+            printf("%s",cValor); //Imprimindo valor *
 			}
-            }else if (cCaracter == 8 && iQtdCaracter)
+		}
+        }else if (cCaracter == 8 && iQtdCaracter)
             {
-                data[iQtdCaracter] = '\0';
+                cValor[iQtdCaracter] = '\0';
                 iQtdCaracter--;
                 x--;
                 printf("\b \b"); //Apagando os caracteres digitados
 			}
-        } while (cCaracter != 13); //13 � o valor de ENTER na tabela ASCII
+        } while (cCaracter != 13); //13 ? o valor de ENTER na tabela ASCII
         iQtdCaracter+=1;
-        data[iQtdCaracter] = '\0';
-        //printf("\n%s",data);
-        fValor = atof(data);
+        cValor[iQtdCaracter] = '\0';
+        fValor = atof(cValor);
         return fValor;
 }
 
+int FormatarData(){
+  char cCaracter;
+    char data[10];
+    int iQtdCaracter,x, z=0;
+        iQtdCaracter = 0;
+        do
+        {
+        	fflush(stdin);
+            cCaracter = getch();
+            if (isprint(cCaracter) && (iQtdCaracter != 10))
+            { //Analisa se o valor de c � imprim�vel
+            if(cCaracter=='0'|| cCaracter=='1'|| cCaracter=='2'||cCaracter=='3' || cCaracter=='4'||cCaracter=='5' || cCaracter=='6'||cCaracter=='7' || cCaracter=='8'||cCaracter=='9'){
+                data[iQtdCaracter] = cCaracter;
+                iQtdCaracter++;
+                x++;
+                printf("%c",cCaracter);
+                if(iQtdCaracter==2){
+                	printf("\b\b");	
+                	data[2] = '/';
+                	printf("%s",data);
+                	iQtdCaracter++;
+				}else if(iQtdCaracter==5){
+				printf("\b\b\b\b\b");	
+                	data[5] = '/';
+                	printf("%s",data);
+                	iQtdCaracter++;
+			}		
+			}
+		}	 
+            else if (cCaracter == 8 && iQtdCaracter)
+            {
+                data[iQtdCaracter] = '\0';
+                iQtdCaracter--;
+                printf("\b \b"); //Apagando os caracteres digitados
+			}else if(cCaracter==13 && iQtdCaracter==10){
+				z=1;
+			}
+        } while (z != 1); //13 � o valor de ENTER na tabela ASCII
+        data[iQtdCaracter] = '\0';
+    	return data;
+}
+
+int FormatarTelefone(){
+  char cCaracter;
+    char fTelefone[13];
+    int iQtdCaracter,x, z=0;
+        iQtdCaracter = 1;
+        printf("(");
+        do
+        {
+        	fflush(stdin);
+            cCaracter = getch();
+            if (isprint(cCaracter) && (iQtdCaracter != 13))
+            { //Analisa se o valor de c � imprim�vel
+            if(cCaracter=='0'|| cCaracter=='1'|| cCaracter=='2'||cCaracter=='3' || cCaracter=='4'||cCaracter=='5' || cCaracter=='6'||cCaracter=='7' || cCaracter=='8'||cCaracter=='9'){
+				fTelefone[iQtdCaracter] = cCaracter;
+                iQtdCaracter++;
+                fTelefone[0] ='(';
+                x++;
+                printf("%c",cCaracter);
+                if(iQtdCaracter==3){
+                	printf("\b\b\b");	
+                	fTelefone[3] = ')';
+                	printf("%s",fTelefone);
+                	iQtdCaracter++;
+				}else if(iQtdCaracter==8){
+				printf("\b\b\b\b\b\b\b\b");	
+                	fTelefone[8] = '-';
+                	printf("%c%c%c%c%c%c%c%c%c",fTelefone[0],fTelefone[1],fTelefone[2],fTelefone[3],fTelefone[4],fTelefone[5],fTelefone[6],fTelefone[7],fTelefone[8],fTelefone[9]);            	
+                	iQtdCaracter++;
+			}		
+			}
+		}	 
+            else if (cCaracter == 8 && iQtdCaracter!=1)
+            {fTelefone[0] = '\0';
+                fTelefone[iQtdCaracter] = '\0';
+                iQtdCaracter--;
+                printf("\b \b"); //Apagando os caracteres digitados
+			}else if(cCaracter==13 && iQtdCaracter==13){
+				z=1;
+			}
+        } while (z!=1); //13 � o valor de ENTER na tabela ASCII
+        fTelefone[iQtdCaracter] = '\0';
+    	return fTelefone;
+}
+
+int FormatarCelular(){
+  char cCaracter;
+    char cCelular[14];
+    int iQtdCaracter,x, z=0;
+        iQtdCaracter = 1;
+        printf("(");
+        do
+        {
+        	fflush(stdin);
+            cCaracter = getch();
+            if (isprint(cCaracter) && (iQtdCaracter != 14))
+            { //Analisa se o valor de c � imprim�vel
+            if(cCaracter=='0'|| cCaracter=='1'|| cCaracter=='2'||cCaracter=='3' || cCaracter=='4'||cCaracter=='5' || cCaracter=='6'||cCaracter=='7' || cCaracter=='8'||cCaracter=='9'){
+				cCelular[iQtdCaracter] = cCaracter;
+                iQtdCaracter++;
+                cCelular[0] ='(';
+                x++;
+                printf("%c",cCaracter);
+                if(iQtdCaracter==3){
+                	printf("\b\b\b");	
+                	cCelular[3] = ')';
+                	printf("%s",cCelular);
+                	iQtdCaracter++;
+				}else if(iQtdCaracter==9){
+				printf("\b\b\b\b\b\b\b\b\b");	
+                	cCelular[9] = '-';
+                	printf("%c%c%c%c%c%c%c%c%c%c",cCelular[0],cCelular[1],cCelular[2],cCelular[3],cCelular[4],cCelular[5],cCelular[6],cCelular[7],cCelular[8],cCelular[9],cCelular[10]);
+                	iQtdCaracter++;		
+			}	
+			}	
+		}	 
+            else if (cCaracter == 8 && iQtdCaracter!=1)
+            {cCelular[0] = '\0';
+                cCelular[iQtdCaracter] = '\0';
+                iQtdCaracter--;
+                printf("\b \b"); //Apagando os caracteres digitados
+			}else if(cCaracter==13 && iQtdCaracter==14){
+				z=1;
+			}
+        } while (z != 1); //13 � o valor de ENTER na tabela ASCII
+        cCelular[iQtdCaracter] = '\0';
+        fflush(stdin);
+    	return cCelular;
+}
+
+int FormatarCPF(){
+  char cCaracter;
+    char cCpf[14];
+    int iQtdCaracter,x, z=0;
+        iQtdCaracter = 0;
+        do
+        {
+        	fflush(stdin);
+            cCaracter = getch();
+            if (isprint(cCaracter) && (iQtdCaracter != 14))
+            { //Analisa se o valor de c � imprim�vel
+            if(cCaracter=='0'|| cCaracter=='1'|| cCaracter=='2'||cCaracter=='3' || cCaracter=='4'||cCaracter=='5' || cCaracter=='6'||cCaracter=='7' || cCaracter=='8'||cCaracter=='9'){
+                cCpf[iQtdCaracter] = cCaracter;
+                iQtdCaracter++;
+                x++;
+                printf("%c",cCaracter); //Imprimindo apenas o asterisco *
+                if(iQtdCaracter==3){
+                	printf("\b\b\b");	
+                	cCpf[3] = '.';
+                	printf("%s",cCpf);
+                	iQtdCaracter++;
+				}else if(iQtdCaracter==7){
+				printf("\b\b\b\b\b\b\b");	
+                	cCpf[7] = '.';
+                	printf("%s",cCpf);
+                	iQtdCaracter++;
+			}else if(iQtdCaracter==11){
+				printf("\b\b\b\b\b\b\b\b\b\b\b\b");	
+                	cCpf[11] = '-';
+                	printf("%s",cCpf);
+                	iQtdCaracter++;
+			}			
+			}
+		}	 
+            else if (cCaracter == 8 && iQtdCaracter)
+            {
+                cCpf[iQtdCaracter] = '\0';
+                iQtdCaracter--;
+                printf("\b \b"); //Apagando os caracteres digitados
+			}else if(cCaracter==13 && iQtdCaracter==14){
+				z=1;
+			}
+        } while (z != 1); //13 � o valor de ENTER na tabela ASCII
+        cCpf[iQtdCaracter] = '\0';
+    	return cCpf;
+}
+
+int Nome(){
+  char cCaracter;
+    char cNome[200];
+    int iQtdCaracter,x, z=0;
+        iQtdCaracter = 0;
+        do
+        {
+        	fflush(stdin);
+            cCaracter = getch();
+            if (isprint(cCaracter))
+            { //Analisa se o valor de c � imprim�vel
+            cNome[iQtdCaracter] = cCaracter;
+                iQtdCaracter++;
+                printf("%c",cCaracter); //Imprimindo apenas o asterisco *			
+		}	 
+            else if (cCaracter == 8 && iQtdCaracter)
+            {
+                cNome[iQtdCaracter] = '\0';
+                iQtdCaracter--;
+                printf("\b \b"); //Apagando os caracteres digitados
+			}else if(cCaracter==13 && iQtdCaracter!=0){
+				z=1;
+			}
+        } while (z != 1); //13 � o valor de ENTER na tabela ASCII
+        cNome[iQtdCaracter] = '\0';
+    	return cNome;
+}
+
 void listarProdutos(){
-    system("cls || clear");
-    printf("\n\t\t\tListando Produtos\n");
+    tela("\tLISTA DE PRODUTOS");
     printf("\n--------------------------------------------------------------------------------\n");
     if(pProdutoInicial == NULL){
          nullList();
@@ -670,25 +925,29 @@ void listarProdutos(){
         Produto *pAux = pProdutoInicial;
         while(pAux != NULL){
             printf("\nNome: %s |\tValidade: %s|\tValor: %.2f", pAux->cvNome, pAux->cvValidade,pAux->fValor);
-            printf("\nQuantidade Est.: %d |\tCodigo: %s |\tCodigo Fornecedor: %d", pAux->iQtdEstoque, pAux->cvCodigo, pAux->iCodigoFornecedor);
+           printf("\nQuantidade Est.: %d |\tEst. Seguranca: %d |\tCodigo: %s |\tCodigo Fornecedor: %d", pAux->iQtdEstoque, pAux->iEstoqSeguranca,pAux->cvCodigo, pAux->iCodigoFornecedor);
             printf("\n------------------------------------------------------------------------------\n");
+            printf("\n\t\t\   PRESSIONE QUALQUER TECLA PARA VOLTAR!");
             pAux = pAux->pProximo;
         }
     }
+    char cListar;
+    cListar = getchar();
+    getchar();
 }
 
 int alteraProduto()
 {
-   	system("cls || clear");
     int iOp;
     
 	do{
-    	printf("\n\t\t\Alterar Produtos\n");
+    	tela("\tALTERAR PRODUTO");
     	printf("0 - Sair\n");
     	printf("1 - Alterar Codigo\n");
     	printf("2 - Alterar Nome\n");
     	printf("3 - Alterar Valor\n");
     	printf("4 - Alterar Quant. Estoque\n");
+    	printf("5 - Alterar Estoque Seguranca\n");
     	printf("Escolha uma opcao: ");
     	scanf("%d", &iOp);
     	switch(iOp){
@@ -711,6 +970,10 @@ int alteraProduto()
     			system("cls || clear");
     			alteraQtdProduto();
     			break;
+    		case 5:
+			 	system("cls || clear");
+			 	alteraEstoqueSeg();
+    			break;
     		default:
     			defaultMessage();
     			break;
@@ -724,18 +987,16 @@ int alteraCodigoProduto(){
 	char cvNovoCod[51];
 	int iNaoEncontrado = 0;
 	
-    flush_in();
+    fflush(stdin);
     printf("\nEntre com o codigo do produto a ser alterado: ");
-    fgets(cvCodigoP, sizeof(cvCodigoP), stdin);
-    cvCodigoP[strcspn(cvCodigoP, "\n")] = '\0';
+    strcpy(cvCodigoP,Nome());
 
 	
 	while(pAux != NULL){
 		if(!strcmp(pAux->cvCodigo, cvCodigoP)){
 			printf("Codigo atual: %s\tProduto: %s\n", pAux->cvCodigo, pAux->cvNome);
 			printf("Digite o novo codigo: ");
-			fgets(cvNovoCod, sizeof(cvNovoCod), stdin);
-			cvNovoCod[strcspn(cvNovoCod, "\n")] = '\0';
+			strcpy(cvNovoCod,Nome());
 			strcpy(pAux->cvCodigo, cvNovoCod);
 			iNaoEncontrado++;
 		}
@@ -755,17 +1016,15 @@ int alteraNomeProduto(){
 	char cvNovoNome[201];
 	int iNaoEncontrado = 0;
 	
-	flush_in();
+	fflush(stdin);
     printf("\nEntre com o codigo do produto a ser alterado: ");
-    fgets(cvCodigoP, sizeof(cvCodigoP), stdin);
-    cvCodigoP[strcspn(cvCodigoP, "\n")] = '\0';
+    strcpy(cvCodigoP,Nome());
     
 	while(pAux != NULL){
 		if(!strcmp(pAux->cvCodigo, cvCodigoP)){
 			printf("Nome atual: %s\n", pAux->cvNome);
 			printf("Digite o novo nome: ");
-			fgets(cvNovoNome, sizeof(cvNovoNome), stdin);
-			cvNovoNome[strcspn(cvNovoNome, "\n")] = '\0';
+			strcpy(cvNovoNome,Nome());
 			strcpy(pAux->cvNome,cvNovoNome);
 			iNaoEncontrado++;
 		}
@@ -784,17 +1043,15 @@ int alteraValorProduto(){
 	int iNaoEncontrado = 0;
 	float fNovoValor;
 	
-	flush_in();
+	fflush(stdin);
     printf("\nEntre com o codigo do produto a ser alterado: ");
-    fgets(cvCodigoP, sizeof(cvCodigoP), stdin);
-    cvCodigoP[strcspn(cvCodigoP, "\n")] = '\0';
+    strcpy(cvCodigoP,Nome());
     
 	while(pAux != NULL){
 		if(!strcmp(pAux->cvCodigo, cvCodigoP)){
 			printf("Valor atual: %.2f\tProduto: %s\n", pAux->fValor, pAux->cvNome);
 			printf("Digite o novo valor: R$ ");
-			scanf("%f", &fNovoValor);
-			pAux->fValor = fNovoValor;
+			pAux->fValor = pegaValorProd();
 			iNaoEncontrado++;
 		}
 		pAux = pAux->pProximo;
@@ -812,10 +1069,9 @@ int alteraQtdProduto(){
 	int iNaoEncontrado = 0;
 	int iNovoQtd;
 	
-	flush_in();
+	fflush(stdin);
     printf("\nEntre com o codigo do produto a ser alterado: ");
-    fgets(cvCodigoP, sizeof(cvCodigoP), stdin);
-    cvCodigoP[strcspn(cvCodigoP, "\n")] = '\0';
+    strcpy(cvCodigoP,Nome());
     
 	while(pAux != NULL){
 		if(!strcmp(pAux->cvCodigo, cvCodigoP)){
@@ -834,11 +1090,38 @@ int alteraQtdProduto(){
 	}
 }
 
+int alteraEstoqueSeg(){
+	Produto *pAux = pProdutoInicial;
+	char cvCodigoP[51];
+	int iNaoEncontrado = 0;
+	int iNovoQtd;
+	
+	fflush(stdin);
+    printf("\nEntre com o codigo do produto a ser alterado: ");
+    strcpy(cvCodigoP,Nome());
+    
+	while(pAux != NULL){
+		if(!strcmp(pAux->cvCodigo, cvCodigoP)){
+			printf("Qtd. Estoque Seguranca atual: %d\tProduto: %s\n", pAux->iEstoqSeguranca, pAux->cvNome);
+			printf("Digite a nova quantidade de seguranca: ");
+			scanf("%d", &iNovoQtd);
+			pAux->iEstoqSeguranca += iNovoQtd;
+			iNaoEncontrado++;
+		}
+		pAux = pAux->pProximo;
+	}
+	if(!iNaoEncontrado){
+		notFound("Produto");
+	}else{
+		alteradoSucesso("A quantidade do produto");
+	}
+}
+
 void removeProduto()
 {
+	tela("REMOVER PRODUTO");
     Produto *pAux = pProdutoInicial;
     Produto *pAnterior;
-    printf("\n\t\t\tRemover produto\n");
     if (pProdutoInicial == NULL)
     {
         printf("\nA lista ja esta vazia!");
@@ -850,9 +1133,8 @@ void removeProduto()
         char cEscolha;
         int iNaoEncontrado = 0;
         printf("Entre com o codigo do produto que deseja remover: ");
-        flush_in();
-        fgets(cvCodigoP, sizeof(cvCodigoP), stdin);
-        cvCodigoP[strcspn(cvCodigoP, "\n")] = '\0';
+        fflush(stdin);
+        strcpy(cvCodigoP,Nome());
 
         while (pAux != NULL)
         {
@@ -888,35 +1170,28 @@ void removeProduto()
 }
 
 int cadastrarFornecedor(){
-    system("cls || clear");
     char cEscolha;
-    printf("\n\t\t\tCadastro de Fornecedor\n");
+    tela("\tCADASTRO DE FORNECEDOR");
     do{
         Fornecedor *novoFornecedor = (Fornecedor*) malloc(sizeof(Fornecedor));
         novoFornecedor->fProximo = NULL;
 
         printf("\nNome Fornecedor: ");
-        flush_in();
-        fgets(novoFornecedor->cvNome, sizeof(novoFornecedor->cvNome), stdin);
-        novoFornecedor->cvNome[strcspn(novoFornecedor->cvNome, "\n")] = '\0';
+        fflush(stdin);
+        strcpy(novoFornecedor->cvNome,Nome());
         printf("\nNome Fantasia: ");
-        fgets(novoFornecedor->cvNomeFantasia, sizeof(novoFornecedor->cvNomeFantasia), stdin);
-        novoFornecedor->cvNomeFantasia[strcspn(novoFornecedor->cvNomeFantasia, "\n")] = '\0';
+        strcpy(novoFornecedor->cvNomeFantasia,Nome());
         printf("\nEndereco: ");
-        fgets(novoFornecedor->cvEndereco, sizeof(novoFornecedor->cvEndereco), stdin);
-        novoFornecedor->cvEndereco[strcspn(novoFornecedor->cvEndereco, "\n")] = '\0';
+        strcpy(novoFornecedor->cvEndereco,Nome());
         printf("\nCNPJ: ");
-        fgets(novoFornecedor->cvCnpj, sizeof(novoFornecedor->cvCnpj), stdin);
-        novoFornecedor->cvCnpj[strcspn(novoFornecedor->cvCnpj, "\n")] = '\0';
+        strcpy(novoFornecedor->cvCnpj,Nome());
         printf("\nEmail: ");
-        fgets(novoFornecedor->cvEmail, sizeof(novoFornecedor->cvNome), stdin);
-        novoFornecedor->cvEmail[strcspn(novoFornecedor->cvEmail, "\n")] = '\0';
+        strcpy(novoFornecedor->cvEmail,Nome());
         printf("\nTelefone: ");
-        fgets(novoFornecedor->cvTelefone, sizeof(novoFornecedor->cvTelefone), stdin);
-        novoFornecedor->cvTelefone[strcspn(novoFornecedor->cvTelefone, "\n")] = '\0';
+        strcpy(novoFornecedor->cvTelefone, FormatarTelefone());
+        fflush(stdin);
         printf("\nCelular: ");
-        fgets(novoFornecedor->cvCelular, sizeof(novoFornecedor->cvCelular), stdin);
-        novoFornecedor->cvCelular[strcspn(novoFornecedor->cvCelular, "\n")] = '\0';
+        strcpy(novoFornecedor->cvCelular, FormatarCelular());
         printf("\nCodigo Produto(APENAS NUMEROS): ");
         scanf("%d", &novoFornecedor->iCodigoProduto);
 
@@ -936,8 +1211,7 @@ int cadastrarFornecedor(){
 }
 
 void listarFornecedor(){
-    system("cls || clear");
-    printf("\n\t\t\tListando Fornecedores\n");
+    tela("\tLISTA DE FORNECEDORES");
     printf("\n--------------------------------------------------------------------------------\n");
     if(fFornecedorInicial == NULL){
         nullList();
@@ -949,47 +1223,44 @@ void listarFornecedor(){
             printf("\nEmail: %s |\tTelefone: %s ",  fAux->cvEmail, fAux->cvTelefone);
             printf("\nCelular: %s |\tCodigo Produto: %d", fAux->cvCelular, fAux->iCodigoProduto);
             printf("\n------------------------------------------------------------------------------\n");
+            printf("\n\t\t\   PRESSIONE QUALQUER TECLA PARA VOLTAR!");
             fAux = fAux->fProximo;
         }
     }
+    char cListar;
+    cListar = getchar();
+    getchar();
 }
 
 void alteraFornecedor()
 {
-
+	tela("\tALTERAR FORNECEDOR");
     Fornecedor *fAux = fFornecedorInicial;
     char cvExNome[201];
-    flush_in();
+    fflush(stdin);
     editMessage("fornecedor");
-    fgets(cvExNome, sizeof(cvExNome), stdin);
-    cvExNome[strcspn(cvExNome, "\n")] = '\0';
+    strcpy(cvExNome,Nome());
     int iNaoEncontrado = 0;
     while (fAux != NULL)
     {
         if (!strcmp(fAux->cvNome, cvExNome) || !strcmp(fAux->cvNomeFantasia, cvExNome))
         {
-            flush_in();
+            fflush(stdin);
             printf("\nNome do Fornecedor: ");
-            fgets(fAux->cvNome, sizeof(fAux->cvNome), stdin);
-            fAux->cvNome[strcspn(fAux->cvNome, "\n")] = '\0';
+            strcpy(fAux->cvNome,Nome());
             printf("\nNome Fantasia: ");
-            fgets(fAux->cvNomeFantasia, sizeof(fAux->cvNomeFantasia), stdin);
-            fAux->cvNomeFantasia[strcspn(fAux->cvNomeFantasia, "\n")] = '\0';
+            strcpy(fAux->cvNomeFantasia,Nome());
             printf("\nEndereco: ");
-            fgets(fAux->cvEndereco, sizeof(fAux->cvEndereco), stdin);
-            fAux->cvEndereco[strcspn(fAux->cvEndereco, "\n")] = '\0';
+            strcpy(fAux->cvEndereco,Nome());
             printf("\CNPJ: ");
-            fgets(fAux->cvCnpj, sizeof(fAux->cvCnpj), stdin);
-            fAux->cvCnpj[strcspn(fAux->cvCnpj, "\n")] = '\0';
+            strcpy(fAux->cvCnpj,Nome());
             printf("\nEmail: ");
-            fgets(fAux->cvEmail, sizeof(fAux->cvEmail), stdin);
-            fAux->cvEmail[strcspn(fAux->cvEmail, "\n")] = '\0';
+            strcpy(fAux->cvEmail,Nome());
             printf("\nTelefone: ");
-            fgets(fAux->cvTelefone, sizeof(fAux->cvTelefone), stdin);
-            fAux->cvTelefone[strcspn(fAux->cvTelefone, "\n")] = '\0';
-            printf("\nCelular: ");
-            fgets(fAux->cvCelular, sizeof(fAux->cvCelular), stdin);
-            fAux->cvCelular[strcspn(fAux->cvCelular, "\n")] = '\0';
+        strcpy(fAux->cvTelefone, FormatarTelefone());
+        fflush(stdin);
+        printf("\nCelular: ");
+        strcpy(fAux->cvCelular, FormatarCelular());
             printf("\nCodigo Produto(APENAS NUMEROS): ");
             scanf("%d", &fAux->iCodigoProduto);
             iNaoEncontrado++;
@@ -1005,7 +1276,7 @@ void alteraFornecedor()
 }
 
 void removeFornecedor(){
-    printf("\n\t\t\tRemover Fornecedor\n");
+    tela("\tREMOVER FORNECEDOR");
     Fornecedor *fAux = fFornecedorInicial;
     Fornecedor *fAnterior;
     if(fFornecedorInicial == NULL){
@@ -1015,9 +1286,8 @@ void removeFornecedor(){
 		char cvNomeTemp[200]; //Armazena o nome do item excluido temporariamente
 		int iNaoEncontrado = 0;
         printf("Entre com o nome do fornecedor que deseja remover: ");
-        flush_in();
-        fgets(cvNomeP, sizeof(cvNomeP), stdin);
-        cvNomeP[strcspn(cvNomeP, "\n")] = '\0';
+        fflush(stdin);
+        strcpy(cvNomeP,Nome());
         
         while(fAux != NULL){
         	if(!strcmp(fAux->cvNome, cvNomeP) || !strcmp(fAux->cvNomeFantasia, cvNomeP)){
@@ -1047,35 +1317,27 @@ void removeFornecedor(){
 }
 
 int cadastrarCliente(){
-    system("cls || clear");
     char cEscolha;
-    printf("\n\t\t\tCadastro de Cliente\n");
+    tela("\tCADASTRO DE CLIENTE");
     do{
         Cliente *cNovocliente = (Cliente*) malloc(sizeof(Cliente));
         cNovocliente->cProximo = NULL;
 
-        flush_in();
+        fflush(stdin);
         printf("\nNome: ");
-        fgets(cNovocliente->cvNomeCli, sizeof(cNovocliente->cvNomeCli), stdin);
-        cNovocliente->cvNomeCli[strcspn(cNovocliente->cvNomeCli, "\n")] = '\0';
+        strcpy(cNovocliente->cvNomeCli,Nome());
         printf("\nCPF: ");
-        fgets(cNovocliente->cvCpf, sizeof(cNovocliente->cvCpf), stdin);
-        cNovocliente->cvCpf[strcspn(cNovocliente->cvCpf, "\n")] = '\0';
+        strcpy(cNovocliente->cvCpf,FormatarCPF());
         printf("\nData de Nascimento: ");
-        fgets(cNovocliente->cvData_nascimento, sizeof(cNovocliente->cvData_nascimento), stdin);
-        cNovocliente->cvData_nascimento[strcspn(cNovocliente->cvData_nascimento, "\n")] = '\0';
+        strcpy(cNovocliente->cvData_nascimento,FormatarData());
         printf("\nEmail: ");
-        fgets(cNovocliente->cvEmail, sizeof(cNovocliente->cvEmail), stdin);
-        cNovocliente->cvEmail[strcspn(cNovocliente->cvEmail, "\n")] = '\0';
+        strcpy(cNovocliente->cvEmail,Nome());
         printf("\nTelefone: ");
-        fgets(cNovocliente->cvTelefone, sizeof(cNovocliente->cvTelefone), stdin);
-        cNovocliente->cvTelefone[strcspn(cNovocliente->cvTelefone, "\n")] = '\0';
+        strcpy(cNovocliente->cvTelefone,FormatarTelefone());
         printf("\nCelular: ");
-        fgets(cNovocliente->cvCelular, sizeof(cNovocliente->cvCelular), stdin);
-        cNovocliente->cvCelular[strcspn(cNovocliente->cvCelular, "\n")] = '\0';
+        strcpy(cNovocliente->cvCelular,FormatarCelular());
         printf("\nEndereco: ");
-        fgets(cNovocliente->cvEndereco, sizeof(cNovocliente->cvEndereco), stdin);
-        cNovocliente->cvEndereco[strcspn(cNovocliente->cvEndereco, "\n")] = '\0';
+        strcpy(cNovocliente->cvEndereco,Nome());
 
         if(cClienteInicial == NULL){
             cClienteInicial = cNovocliente;
@@ -1092,8 +1354,7 @@ int cadastrarCliente(){
 }
 
 void listarCliente(){
-    system("cls || clear");
-    printf("\n\t\t\tListando Clientes:\n\n");
+    tela("\tLISTA DE CLIENTES");
     printf("\n------------------------------------------------------------------------------\n");
     if(cClienteInicial == NULL){
         nullList();
@@ -1104,47 +1365,44 @@ void listarCliente(){
             printf("\nEmail: %s |\tTelefone: %s", cAux->cvEmail, cAux->cvTelefone);
             printf("\nCelular: %s |\tEndereco: %s", cAux->cvCelular, cAux->cvEndereco);
             printf("\n------------------------------------------------------------------------------\n");
+            printf("\n\t\t\   PRESSIONE QUALQUER TECLA PARA VOLTAR!");
             cAux = cAux->cProximo;
         }
-
     }
+    char cListar;
+    cListar = getchar();
+    getchar();
 }
 
 void alteraCliente()
 {
+	tela("\tALTERAR CLIENTE");
     Cliente *cAux = cClienteInicial;
     char cvExNome[201];
-    flush_in();
+    fflush(stdin);
     editMessage("cliente");
-    fgets(cvExNome, sizeof(cvExNome), stdin);
-    cvExNome[strcspn(cvExNome, "\n")] = '\0';
+    strcpy(cvExNome,Nome());
     int iNaoEncontrado = 0;
     while (cAux != NULL)
     {
         if (!strcmp(cAux->cvNomeCli, cvExNome))
         {
-            flush_in();
+            fflush(stdin);
             printf("\nNome: ");
-            fgets(cAux->cvNomeCli, sizeof(cAux->cvNomeCli), stdin);
-            cAux->cvNomeCli[strcspn(cAux->cvNomeCli, "\n")] = '\0';
+            strcpy(cAux->cvNomeCli,Nome());
             printf("\nCPF: ");
-            fgets(cAux->cvCpf, sizeof(cAux->cvCpf), stdin);
-            cAux->cvCpf[strcspn(cAux->cvCpf, "\n")] = '\0';
+            strcpy(cAux->cvCpf,FormatarCPF());
             printf("\nData de Nascimento: ");
-            fgets(cAux->cvData_nascimento, sizeof(cAux->cvData_nascimento), stdin);
-            cAux->cvData_nascimento[strcspn(cAux->cvData_nascimento, "\n")] = '\0';
+            strcpy(cAux->cvData_nascimento,FormatarData());
             printf("\nEmail: ");
-            fgets(cAux->cvEmail, sizeof(cAux->cvEmail), stdin);
-            cAux->cvEmail[strcspn(cAux->cvEmail, "\n")] = '\0';
+            strcpy(cAux->cvEmail,Nome());
             printf("\nTelefone: ");
-            fgets(cAux->cvTelefone, sizeof(cAux->cvTelefone), stdin);
-            cAux->cvTelefone[strcspn(cAux->cvTelefone, "\n")] = '\0';
+            strcpy(cAux->cvTelefone,FormatarTelefone());
             printf("\nCelular: ");
-            fgets(cAux->cvCelular, sizeof(cAux->cvCelular), stdin);
-            cAux->cvCelular[strcspn(cAux->cvCelular, "\n")] = '\0';
+            fflush(stdin);
+            strcpy(cAux->cvCelular,FormatarCelular());
             printf("\nEndereco: ");
-            fgets(cAux->cvEndereco, sizeof(cAux->cvEndereco), stdin);
-            cAux->cvEndereco[strcspn(cAux->cvEndereco, "\n")] = '\0';
+            strcpy(cAux->cvEndereco,Nome());
             iNaoEncontrado++;
             break;
         }
@@ -1158,7 +1416,7 @@ void alteraCliente()
 }
 
 void removeCliente(){
-    printf("\n\t\t\tRemovendo Cliente\n");
+    tela("\tREMOVER CLIENTE");
     Cliente *cAux = cClienteInicial;
     Cliente *cAnterior;
     if(cClienteInicial == NULL){
@@ -1168,7 +1426,7 @@ void removeCliente(){
         char cvNomeP[201];
         char cvNomeTemp[200]; //Armazena o nome do item excluido temporariamente
         int iNaoEncontrado = 0;
-        flush_in();
+        fflush(stdin);
         printf("Entre com o nome do cliente que deseja remover: ");
         fgets(cvNomeP, sizeof(cvNomeP), stdin);
         cvNomeP[strcspn(cvNomeP, "\n")] = '\0';
@@ -1205,56 +1463,50 @@ int cadastrarFuncionario(){
     char cEscolha;
     int op;
     if(!iAdm){
-    	char *t="SEJA BEM VINDO ADMINISTRADOR, CADASTRE SEU LOGIN!!";
+    	char *t="  SEJA BEM VINDO, CADASTRE SEU LOGIN!!";
 		tela(t);
         Funcionario *fNovoFuncionario = (Funcionario *) malloc(sizeof(Funcionario));
         fNovoFuncionario->funProximo = NULL;
 
         printf("\nNome: ");
-        fgets(fNovoFuncionario->cvNomeFunc, sizeof(fNovoFuncionario->cvNomeFunc), stdin);
-        fNovoFuncionario->cvNomeFunc[strcspn(fNovoFuncionario->cvNomeFunc, "\n")] = '\0';
+        strcpy(fNovoFuncionario->cvNomeFunc,Nome());
         strcpy(fNovoFuncionario->cvCargo, "ADMINISTRADOR");
 		CadastroLogin(fNovoFuncionario->cvLogin, fNovoFuncionario->cvSenha);
 
         if(fFuncionarioInicial == NULL) {
             fFuncionarioInicial = fNovoFuncionario;
         }
-        system("cls || clear");
         iAdm=1;
-        printf("\n\t\t\tContinuar cadastro...\n");
-        fflush(stdin);
+        tela("\t CADASTRO DE FUNCIONARIO");
         printf("\nCPF: ");
-        fgets(fNovoFuncionario->cvCpf, sizeof(fNovoFuncionario->cvCpf), stdin);
-        fNovoFuncionario->cvCpf[strcspn(fNovoFuncionario->cvCpf, "\n")] = '\0';
+        fflush(stdin);
+        strcpy(fNovoFuncionario->cvCpf,FormatarCPF());
+        fflush(stdin);
         printf("\nData de Nascimento: ");
-        fgets(fNovoFuncionario->cvData_nascimento, sizeof(fNovoFuncionario->cvData_nascimento), stdin);
-        fNovoFuncionario->cvData_nascimento[strcspn(fNovoFuncionario->cvData_nascimento, "\n")] = '\0';
+        strcpy(fNovoFuncionario->cvData_nascimento,FormatarData());
         printf("\nEmail: ");
-        fgets(fNovoFuncionario->cvEmail, sizeof(fNovoFuncionario->cvEmail), stdin);
-        fNovoFuncionario->cvEmail[strcspn(fNovoFuncionario->cvEmail, "\n")] = '\0';
+        strcpy(fNovoFuncionario->cvEmail,Nome());
         printf("\nTelefone: ");
-        fgets(fNovoFuncionario->cvTelefone, sizeof(fNovoFuncionario->cvTelefone), stdin);
-        fNovoFuncionario->cvTelefone[strcspn(fNovoFuncionario->cvTelefone, "\n")] = '\0';
+        fflush(stdin);
+        strcpy(fNovoFuncionario->cvTelefone,FormatarTelefone());
         printf("\nCelular: ");
-        fgets(fNovoFuncionario->cvCelular, sizeof(fNovoFuncionario->cvCelular), stdin);
-        fNovoFuncionario->cvCelular[strcspn(fNovoFuncionario->cvCelular, "\n")] = '\0';
+        fflush(stdin);
+        strcpy(fNovoFuncionario->cvCelular,FormatarCelular());
         printf("\nEndereco: ");
-        fgets(fNovoFuncionario->cvEndereco, sizeof(fNovoFuncionario->cvEndereco), stdin);
+        strcpy(fNovoFuncionario->cvEndereco,Nome());
         printf("\n\t\t\tENTRANDO...\n");
         Sleep(500);
-        system("cls || clear");
         menu();
 		
 	}else{
-	    printf("\n\t\t\tCadastro de Funcionario\n");
+	    tela("\t CADASTRO DE FUNCIONARIO");
 	    do{
 	        Funcionario *fNovoFuncionario = (Funcionario *) malloc(sizeof(Funcionario));
 	        fNovoFuncionario->funProximo = NULL;
 	    
-	        flush_in();
+	        fflush(stdin);
 	        printf("\nNome: ");
-	        fgets(fNovoFuncionario->cvNomeFunc, sizeof(fNovoFuncionario->cvNomeFunc), stdin);
-	        fNovoFuncionario->cvNomeFunc[strcspn(fNovoFuncionario->cvNomeFunc, "\n")] = '\0';
+	        strcpy(fNovoFuncionario->cvNomeFunc,Nome());
 	        do{
 				printf("\nCargo: ");
 		        printf("\n1: ADMINISTRADOR \n2: CAIXA \n3: FINANCEIRO\n");
@@ -1280,23 +1532,18 @@ int cadastrarFuncionario(){
 		}while((op<1) || (op>3));
 			fflush(stdin);
 	        printf("\nCPF: ");
-	        fgets(fNovoFuncionario->cvCpf, sizeof(fNovoFuncionario->cvCpf), stdin);
-	        fNovoFuncionario->cvCpf[strcspn(fNovoFuncionario->cvCpf, "\n")] = '\0';
+	        strcpy(fNovoFuncionario->cvCpf,FormatarCPF());
 	        printf("\nData de Nascimento: ");
-	        fgets(fNovoFuncionario->cvData_nascimento, sizeof(fNovoFuncionario->cvData_nascimento), stdin);
-	        fNovoFuncionario->cvData_nascimento[strcspn(fNovoFuncionario->cvData_nascimento, "\n")] = '\0';
-	        printf("\nEmail: ");
-	        fgets(fNovoFuncionario->cvEmail, sizeof(fNovoFuncionario->cvEmail), stdin);
-	        fNovoFuncionario->cvEmail[strcspn(fNovoFuncionario->cvEmail, "\n")] = '\0';
-	        printf("\nTelefone: ");
-	        fgets(fNovoFuncionario->cvTelefone, sizeof(fNovoFuncionario->cvTelefone), stdin);
-	        fNovoFuncionario->cvTelefone[strcspn(fNovoFuncionario->cvTelefone, "\n")] = '\0';
-	        printf("\nCelular: ");
-	        fgets(fNovoFuncionario->cvCelular, sizeof(fNovoFuncionario->cvCelular), stdin);
-	        fNovoFuncionario->cvCelular[strcspn(fNovoFuncionario->cvCelular, "\n")] = '\0';
+	        fflush(stdin);
+        	strcpy(fNovoFuncionario->cvData_nascimento,FormatarData());
+        	printf("\nEmail: ");
+        	strcpy(fNovoFuncionario->cvEmail,Nome());
+        	printf("\nTelefone: ");
+        	strcpy(fNovoFuncionario->cvTelefone,FormatarTelefone());
+        	printf("\nCelular: ");
+        	strcpy(fNovoFuncionario->cvCelular,FormatarCelular());
 	        printf("\nEndereco: ");
-	        fgets(fNovoFuncionario->cvEndereco, sizeof(fNovoFuncionario->cvEndereco), stdin);
-	        fNovoFuncionario->cvEndereco[strcspn(fNovoFuncionario->cvEndereco, "\n")] = '\0';
+	        strcpy(fNovoFuncionario->cvEndereco,Nome());
 	        CadastroLogin(fNovoFuncionario->cvLogin, fNovoFuncionario->cvSenha);
 	
 	        if(fFuncionarioInicial == NULL) {
@@ -1316,42 +1563,52 @@ int cadastrarFuncionario(){
 }
 
 void listarFuncionario(){
-    system("cls || clear");
-    printf("\n\t\t\t Listando Funcionarios\n");
-    printf("\n------------------------------------------------------------------------------\n");
+	char c[200]="                                                  ";
+	int iA;
+    tela("\tLISTA DE FUNCIONARIOS");
     if(fFuncionarioInicial == NULL){
         nullList();
     }else{
         Funcionario *fAux = fFuncionarioInicial;
         while(fAux != NULL){
-            printf("\nNome: %s |\tCargo: %s", fAux->cvNomeFunc, fAux->cvCargo);
-            printf("\nCPF: %s |\tData de Nascimento: %s", fAux->cvCpf, fAux->cvData_nascimento);
-            printf("\nEmail: %s |\tTelefone: %s", fAux->cvEmail, fAux->cvTelefone);
-            printf("\nCelular: %s |\tEndereco: %s", fAux->cvCelular, fAux->cvEndereco);
-            printf("\n------------------------------------------------------------------------------\n");
+    iA=50 - strlen(fAux->cvNomeFunc);
+	strncat(fAux->cvNomeFunc,c,iA);
+	iA=49 - strlen(fAux->cvEmail);
+	strncat(fAux->cvEmail,c,iA);
+            printf("Nome: %s|\tCargo: %s", fAux->cvNomeFunc, fAux->cvCargo);
+            printf("\n------------------------------------------------------------------------------------------------------------------------");
+            printf("\nCPF: %s                                     |\tData de Nascimento: %s", fAux->cvCpf, fAux->cvData_nascimento);
+            printf("\n------------------------------------------------------------------------------------------------------------------------");
+            printf("\nCelular: %s                                 |\tTelefone: %s", fAux->cvCelular, fAux->cvTelefone);
+            printf("\n------------------------------------------------------------------------------------------------------------------------");
+            printf("\nEmail: %s|\tEndereco: %s", fAux->cvEmail, fAux->cvEndereco);
+            printf("\n========================================================================================================================\n");
             fAux = fAux->funProximo;
         }
-    }
+    printf("\n\t\t\t\t   PRESSIONE QUALQUER TECLA PARA VOLTAR!");
+	}
+    char cListar;
+    cListar = getchar();
+    getchar();
 }
 
 void alteraFuncionario()
 {
+	tela("\tALTERAR FUNCIONARIO");
     Funcionario *fAux = fFuncionarioInicial;
     int iOp;
     char cvExNome[201];
-    flush_in();
+    fflush(stdin);
     editMessage("funcionario");
-    fgets(cvExNome, sizeof(cvExNome), stdin);
-    cvExNome[strcspn(cvExNome, "\n")] = '\0';
+    strcpy(cvExNome,Nome());
     int iNaoEncontrado = 0;
     while (fAux != NULL)
     {
         if (!strcmp(fAux->cvNomeFunc, cvExNome))
         {
-            flush_in();
+            fflush(stdin);
             printf("\nNome funcionario: ");
-            fgets(fAux->cvNomeFunc, sizeof(fAux->cvNomeFunc), stdin);
-            fAux->cvNomeFunc[strcspn(fAux->cvNomeFunc, "\n")] = '\0';
+            strcpy(fAux->cvNomeFunc,Nome());
             do
             {
                 printf("\nCargo: ");
@@ -1377,25 +1634,20 @@ void alteraFuncionario()
                     break;
                 }
             } while ((iOp < 1) || (iOp > 3));
-            flush_in();
+            fflush(stdin);
             printf("\nCPF: ");
-            fgets(fAux->cvCpf, sizeof(fAux->cvCpf), stdin);
-            fAux->cvCpf[strcspn(fAux->cvCpf, "\n")] = '\0';
+            strcpy(fAux->cvCpf,FormatarCPF());
             printf("\nData de Nascimento: ");
-            fgets(fAux->cvData_nascimento, sizeof(fAux->cvData_nascimento), stdin);
-            fAux->cvData_nascimento[strcspn(fAux->cvData_nascimento, "\n")] = '\0';
-            printf("\nEmail: ");
-            fgets(fAux->cvEmail, sizeof(fAux->cvEmail), stdin);
-            fAux->cvEmail[strcspn(fAux->cvEmail, "\n")] = '\0';
-            printf("\nTelefone: ");
-            fgets(fAux->cvTelefone, sizeof(fAux->cvTelefone), stdin);
-            fAux->cvTelefone[strcspn(fAux->cvTelefone, "\n")] = '\0';
-            printf("\nCelular: ");
-            fgets(fAux->cvCelular, sizeof(fAux->cvCelular), stdin);
-            fAux->cvCelular[strcspn(fAux->cvCelular, "\n")] = '\0';
+        	strcpy(fAux->cvData_nascimento,FormatarData());
+        	printf("\nEmail: ");
+        	strcpy(fAux->cvEmail,Nome());
+        	printf("\nTelefone: ");
+        	strcpy(fAux->cvTelefone,FormatarTelefone());
+        	fflush(stdin);
+        	printf("\nCelular: ");
+        	strcpy(fAux->cvCelular,FormatarCelular());
             printf("\nEndereco: ");
-            fgets(fAux->cvEndereco, sizeof(fAux->cvEndereco), stdin);
-            fAux->cvEndereco[strcspn(fAux->cvEndereco, "\n")] = '\0';
+            strcpy(fAux->cvEndereco,Nome());
             iNaoEncontrado++;
             break;
         }
@@ -1409,7 +1661,7 @@ void alteraFuncionario()
 
 void removeFuncionario()
 {
-    printf("\n\t\t\tRemovendo Funcionario\n");
+    tela("\tREMOVER FUNCIONARIO");
     Funcionario *fAux = fFuncionarioInicial;
     Funcionario *fAnterior;
     if (fFuncionarioInicial == NULL)
@@ -1421,7 +1673,7 @@ void removeFuncionario()
         char cvNomeP[201];
         char cvNomeTemp[200]; // Armazena o nome do item excluido temporariamente
         int iNaoEncontrado = 0;
-        flush_in();
+        fflush(stdin);
         printf("Entre com o nome do funcionario que deseja remover: ");
         fgets(cvNomeP, sizeof(cvNomeP), stdin);
         cvNomeP[strcspn(cvNomeP, "\n")] = '\0';
@@ -1504,11 +1756,20 @@ int venda(){
 			fflush(stdin);
 			ItemVenda *iNovoItem = (ItemVenda*) malloc(sizeof(ItemVenda));
 			iNovoItem->iItemProximo = NULL;
+			Produto *pAux = pProdutoInicial;
+			if(pProdutoInicial == NULL){
+				printf("Nao ha produtos cadastrados!\n");
+				printf("\n\t\t\t\t   PRESSIONE QUALQUER TECLA PARA VOLTAR!");
+			    getchar();
+				return 1;
+			}
+			if(!iItemVendaInicial == NULL){
+				listaItemVenda();
+			}
 			printf("\n\nEntre com o codigo do produto: ");
 			fgets(cvCodProduto, sizeof(cvCodProduto), stdin);
 			cvCodProduto[strcspn(cvCodProduto, "\n")] = '\0';
 			//declarar a struct aux de produtos para pesquisa
-			Produto *pAux = pProdutoInicial;
 			while(pAux != NULL){
 				if(!strcmp(pAux->cvCodigo, cvCodProduto)){
 					strcpy(iNovoItem->cvNomeItem, pAux->cvNome);
@@ -1517,6 +1778,14 @@ int venda(){
 					scanf("%d", &iQuantidade);
 					iNovoItem->fValorItem = pAux->fValor * iQuantidade;;
 					pAux->iQtdEstoque -= iQuantidade;
+					if(pAux->iQtdEstoque < iQuantidade){
+						printf("***********************************************************************************************************************\n");
+						printf("\n\t\t\tO estoque de %s acabou! Avisar o Gerente!!\n", pAux->cvNome);
+						printf("***********************************************************************************************************************\n");
+						char cPegaChar;
+						cPegaChar = getchar();
+						getchar();
+					}
 					totalVenda += iNovoItem->fValorItem;
 					//colocando item na struct
 					if(iItemVendaInicial == NULL){
@@ -1664,13 +1933,65 @@ int verificaCliente(char cvNome[]){
 	
 }
 
+/******* GRAVAR ARQUIVOS *******/
+int gravarProduto(){
+	FILE *arq;
+	int result;
+	arq = fopen("produto.dat", "wb");
+	if(arq == NULL){
+		printf("Problemas na criacao do arquivo\n");
+		return 1;
+	}
+	
+	Produto *pAux = pProdutoInicial;
+	while(pAux != NULL){
+		printf("\nAdd: %s", pAux->cvNome);
+		result = fwrite(pAux, sizeof(Produto),1,arq);
+		pAux = pAux->pProximo;
+	}
+	fclose(arq);
+	pAux = pProdutoInicial;
+	Produto *pAnt = NULL;
+	while(pAux != NULL){
+		pAnt = pAux;
+		pAux = pAux->pProximo;
+		free(pAnt);
+	}
+}
 
-
-//Limpa buffer do teclado
-void flush_in()
-{
-    int ch;
-    while ((ch = fgetc(stdin)) != EOF && ch != '\n')
-    {
-    }
+/******* LER ARQUIVOS *******/
+int lerProduto(){
+	Produto pProduto;
+	FILE *arq;
+	int result;
+	arq = fopen("produto.dat", "rb");
+	if(arq == NULL){
+		printf("Problemas na criacao do arquivo\n");
+		return 0;
+	}
+	
+	while(!feof(arq)){
+		result = fread(&pProduto, sizeof(Produto),1,arq);
+		if(result > 0){
+			Produto *pAux = (Produto*) malloc(sizeof(Produto));
+			strcpy(pAux->cvNome, pProduto.cvNome);
+			strcpy(pAux->cvValidade, pProduto.cvValidade);
+			pAux->fValor = pProduto.fValor;
+			pAux->iQtdEstoque = pProduto.iQtdEstoque;
+			pAux->iEstoqSeguranca = pProduto.iEstoqSeguranca;
+			strcpy(pAux->cvCodigo, pProduto.cvCodigo);
+			pAux->iCodigoFornecedor = pProduto.iCodigoFornecedor;
+			pAux->pProximo = NULL;
+			if(pProdutoInicial == NULL){
+				pProdutoInicial = pAux;
+			}else{
+				Produto *pAux2 = pProdutoInicial;
+				while(pAux2 != NULL){
+					pAux2 = pAux2->pProximo;
+				}
+				pAux2->pProximo = pAux;
+			}
+		}
+	}
+	fclose(arq);
 }
