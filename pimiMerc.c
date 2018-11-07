@@ -151,7 +151,7 @@ int gravarProduto();
 int lerProduto();
 
 int main(){
-	
+	lerProduto();
 	cadastrarFuncionario();
     return 0;
 }
@@ -211,6 +211,7 @@ void verificaEstoqueSegurancao(){
 
 int menuPrincipal()
 {	
+	
     int iOp;
      Funcionario *fAux = fFuncionarioInicial;
     system("cls || clear");
@@ -327,7 +328,6 @@ int menuCadastro()
             cadastrarFornecedor();
             break;
         case 5:
-        	lerProduto();
             menuListar();
             break;
         case 6:
@@ -1961,18 +1961,20 @@ int gravarProduto(){
 
 /******* LER ARQUIVOS *******/
 int lerProduto(){
+	printf("Teste\n");
 	Produto pProduto;
 	FILE *arq;
 	int result;
 	arq = fopen("produto.dat", "rb");
 	if(arq == NULL){
 		printf("Problemas na criacao do arquivo\n");
-		return 0;
+		return 1;
 	}
-	
+	printf("Entrou\n");
 	while(!feof(arq)){
 		result = fread(&pProduto, sizeof(Produto),1,arq);
 		if(result > 0){
+			printf("Chegou aqui\n");
 			Produto *pAux = (Produto*) malloc(sizeof(Produto));
 			strcpy(pAux->cvNome, pProduto.cvNome);
 			strcpy(pAux->cvValidade, pProduto.cvValidade);
@@ -1986,7 +1988,7 @@ int lerProduto(){
 				pProdutoInicial = pAux;
 			}else{
 				Produto *pAux2 = pProdutoInicial;
-				while(pAux2 != NULL){
+				while(pAux2->pProximo != NULL){
 					pAux2 = pAux2->pProximo;
 				}
 				pAux2->pProximo = pAux;
@@ -1994,4 +1996,11 @@ int lerProduto(){
 		}
 	}
 	fclose(arq);
+	/*Produto *pAux = pProdutoInicial;
+	Produto *pAnt;
+	while(pAux != NULL){
+		pAnt = pAux;
+		pAux = pAux->pProximo;
+		free(pAux);
+	}*/
 }
