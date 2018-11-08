@@ -78,6 +78,7 @@ Funcionario *fFuncionarioInicial = NULL;
 Venda *vVendaInicial = NULL;
 ItemVenda *iItemVendaInicial = NULL;
 int iAdm = 0;
+int iHaveLogin = 0;
 
 /* DECLARACAO DE  FUNCOES */
 void sair();
@@ -141,15 +142,19 @@ int Nome();
 /* Arquivos Functions */
 int gravarProduto();
 int gravarFuncionario();
+int gravarLogin();
 
 int lerProduto();
 int lerFuncionario();
+int lerLogin();
 
 int main(){
 	//ler dados dos arquivos
 	lerProduto();
 	lerFuncionario();
-	cadastrarFuncionario();
+
+	VerificarLogin();
+	
     return 0;
 }
 
@@ -544,14 +549,31 @@ void CadastroLogin(char cvCadastroLogin[], char cvCadastroSenha[])
 void VerificarLogin()
 {
     char cCaracter;
+    char cTecla;
     char cvAcessoLogin[50];
     char cvAcessoSenha[07];
     int iQtdCaracter;
     int iSenhaIgual = 0, z = 0;
     char *t="SEJA BEM VINDO, FACA SEU LOGIN!!";
 	tela(t);
+	/****** 1 SOLUCAO PARA CASO NAO TENHA LOGIN ********/
+	//verifica se tem Login
+    printf("\nSe nao tiver login pressione a tecla F2! Caso contrario pressione ENTER");
+    cTecla = getch();
+    if(cTecla == NULL){
+    	cTecla = getch();
+    	switch(cTecla){
+    		case 60: 
+				cadastrarFuncionario();
+				break;
+		}
+	}
+	system("cls || clear");
+	t="SEJA BEM VINDO, FACA SEU LOGIN!!";
+	tela(t);
 	do
     {
+    
         printf("\nEntre com o login: ");
         fflush(stdin); //Limpando o buffer do teclado
         strcpy(cvAcessoLogin,Nome());
@@ -1964,6 +1986,18 @@ int gravarFuncionario(){
 	fclose(arq);
 }
 
+int gravarLogin(){
+	FILE *arq;
+	arq = fopen("login.dat", "wb");
+	if(arq == NULL){
+		printf("\nProblemas na criacao do arquivo");
+		return 1;
+	}
+	
+	fwrite(iHaveLogin, sizeof(int), 1,arq);
+	fclose(arq);
+}
+
 /******* LER ARQUIVOS *******/
 int lerProduto(){
 	Produto pProduto;
@@ -2018,6 +2052,24 @@ int lerFuncionario(){
 			strcpy(newFun->cvSenha, fun.cvSenha);
 			newFun->funProximo = fFuncionarioInicial;
 			fFuncionarioInicial = newFun;
+		}
+	}
+	fclose(arq);
+}
+
+int lerLogin(){
+	int iLogin;
+	FILE *arq;
+	arq = fopen("login.dat", "rb");
+	if(arq == NULL){
+		printf("\nProblemas na criacao do arquivo");
+		return 1;
+	}
+	
+	while(!feof(arq)){
+		int lido = fread(iLogin, sizeof(int),1,arq);
+		if(lido == 1){
+			iHaveLogin = iLogin;
 		}
 	}
 	fclose(arq);
