@@ -79,14 +79,6 @@ Venda *vVendaInicial = NULL;
 ItemVenda *iItemVendaInicial = NULL;
 int iAdm = 0;
 
-
-/**
- * 
- * AS FUNCOES DE REMOVER ESTAO REMOVENDO SEMPRE O PRIMEIRO ELEMENTO DA LISTA
- * ACREDITO QUE TEREI QUE ESPERAR PARA VER LISTA DUPLAMENTE ENCADEADA PARA REMOVER
- * DE ACORDO COM O CODIGO OU NOME
- * 
-*/
 /* DECLARACAO DE  FUNCOES */
 void sair();
 void defaultMessage();
@@ -148,15 +140,21 @@ int Nome();
 
 /* Arquivos Functions */
 int gravarProduto();
+int gravarFuncionario();
+
 int lerProduto();
+int lerFuncionario();
 
 int main(){
+	//ler dados dos arquivos
 	lerProduto();
+	lerFuncionario();
 	cadastrarFuncionario();
     return 0;
 }
 
 void sair(){
+	gravarProduto();
     printf("\nObrigado por utilizar o programa!!!\n");
 }
 
@@ -247,6 +245,7 @@ int menu()
         	system("cls || clear");
         	//struct para arquivo
 			gravarProduto();
+			gravarFuncionario();
             VerificarLogin();
             break;
         case 1:
@@ -1936,7 +1935,6 @@ int verificaCliente(char cvNome[]){
 /******* GRAVAR ARQUIVOS *******/
 int gravarProduto(){
 	FILE *arq;
-	int result;
 	arq = fopen("produto.dat", "wb");
 	if(arq == NULL){
 		printf("Problemas na criacao do arquivo\n");
@@ -1945,35 +1943,39 @@ int gravarProduto(){
 	
 	Produto *pAux = pProdutoInicial;
 	while(pAux != NULL){
-		printf("\nAdd: %s", pAux->cvNome);
-		result = fwrite(pAux, sizeof(Produto),1,arq);
+		fwrite(pAux, sizeof(Produto),1,arq);
 		pAux = pAux->pProximo;
 	}
 	fclose(arq);
-	pAux = pProdutoInicial;
-	Produto *pAnt = NULL;
-	while(pAux != NULL){
-		pAnt = pAux;
-		pAux = pAux->pProximo;
-		free(pAnt);
+}
+
+int gravarFuncionario(){
+	FILE *arq;
+	arq = fopen("funcionario.dat", "wb");
+	if(arq == NULL){
+		printf("\nProblemas na criacao do arquivo");
+		return 1;
 	}
+	Funcionario *fAux = fFuncionarioInicial;
+	while(fAux != NULL){
+		fwrite(fAux, sizeof(Funcionario),1,arq);
+		fAux = fAux->funProximo;
+	}
+	fclose(arq);
 }
 
 /******* LER ARQUIVOS *******/
 int lerProduto(){
-	printf("Teste\n");
 	Produto pProduto;
 	FILE *arq;
-	int result;
 	arq = fopen("produto.dat", "rb");
 	if(arq == NULL){
 		printf("Problemas na criacao do arquivo\n");
 		return 1;
 	}
-	printf("Entrou\n");
 	while(!feof(arq)){
-		result = fread(&pProduto, sizeof(Produto),1,arq);
-		if(result > 0){
+		int lido = fread(&pProduto, sizeof(Produto),1,arq);
+		if(lido == 1){
 			printf("Chegou aqui\n");
 			Produto *pAux = (Produto*) malloc(sizeof(Produto));
 			strcpy(pAux->cvNome, pProduto.cvNome);
@@ -1983,24 +1985,40 @@ int lerProduto(){
 			pAux->iEstoqSeguranca = pProduto.iEstoqSeguranca;
 			strcpy(pAux->cvCodigo, pProduto.cvCodigo);
 			pAux->iCodigoFornecedor = pProduto.iCodigoFornecedor;
-			pAux->pProximo = NULL;
-			if(pProdutoInicial == NULL){
-				pProdutoInicial = pAux;
-			}else{
-				Produto *pAux2 = pProdutoInicial;
-				while(pAux2->pProximo != NULL){
-					pAux2 = pAux2->pProximo;
-				}
-				pAux2->pProximo = pAux;
-			}
+			pAux->pProximo = pProdutoInicial;
+			pProdutoInicial = pAux;
 		}
 	}
 	fclose(arq);
-	/*Produto *pAux = pProdutoInicial;
-	Produto *pAnt;
-	while(pAux != NULL){
-		pAnt = pAux;
-		pAux = pAux->pProximo;
-		free(pAux);
-	}*/
+
+}
+
+int lerFuncionario(){
+	Funcionario fun;
+	FILE *arq;
+	arq = fopen("funcionario.dat", "rb");
+	if(arq == NULL){
+		printf("\nProblemas na criacao do arquivo!\n");
+		return 1;
+	}
+	while(!feof(arq)){
+		int lido = fread(&fun, sizeof(Funcionario),1,arq);
+		if(lido == 1){
+			Funcionario *newFun = (Funcionario*) malloc(sizeof(Funcionario));
+			//jogando dados do arquivo na struct
+			strcpy(newFun->cvNomeFunc, fun.cvNomeFunc);
+			strcpy(newFun->cvCargo, fun.cvCargo);
+			strcpy(newFun->cvCpf, fun.cvCpf);
+			strcpy(newFun->cvData_nascimento, fun.cvData_nascimento);
+			strcpy(newFun->cvEmail, fun.cvEmail);
+			strcpy(newFun->cvTelefone, fun.cvTelefone);
+			strcpy(newFun->cvCelular, fun.cvCelular);
+			strcpy(newFun->cvEndereco, fun.cvEndereco);
+			strcpy(newFun->cvLogin, fun.cvLogin);
+			strcpy(newFun->cvSenha, fun.cvSenha);
+			newFun->funProximo = fFuncionarioInicial;
+			fFuncionarioInicial = newFun;
+		}
+	}
+	fclose(arq);
 }
