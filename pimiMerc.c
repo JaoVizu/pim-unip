@@ -79,6 +79,8 @@ Venda *vVendaInicial = NULL;
 ItemVenda *iItemVendaInicial = NULL;
 int iAdm = 0;
 int iHaveLogin = 0;
+char cvNFuncionario[200];
+char cvCargoFunc[200];
 
 /* DECLARACAO DE  FUNCOES */
 void sair();
@@ -223,8 +225,10 @@ int menuPrincipal()
     				printf("\t\t\t\t*********************************************\n");
     				printf("\t\t\t\t\t\t   MENU\n");
     				printf("\t\t\t\t*********************************************\n");
-	                printf("   %s: ", fAux->cvCargo);
-	                printf("%s ", fAux->cvNomeFunc);
+	                //printf("   %s: ", fAux->cvCargo);
+	                //printf("%s ", fAux->cvNomeFunc);
+	                printf("   %s: ", cvCargoFunc);
+	                printf("%s ", cvNFuncionario);
     				printf("\n\t\t\t\t\t\t\t\t\t\t\t\t\tiMerc.vs2018\n");
     				printf("================================================================================================================================================================================================================================================\n"); 
 	verificaEstoqueSegurancao();    				
@@ -282,8 +286,10 @@ int menuCaixa()
     				printf("\t\t\t\t*********************************************\n");
     				printf("\t\t\t\t\t\t   MENU\n");
     				printf("\t\t\t\t*********************************************\n");
-	                printf("   %s: ", fAux->cvCargo);
-	                printf("%s ", fAux->cvNomeFunc);
+	                /*printf("   %s: ", fAux->cvCargo);
+	                printf("%s ", fAux->cvNomeFunc);*/
+	                printf("   %s: ", cvCargoFunc);
+	                printf("%s ", cvNFuncionario);
     				printf("\n\t\t\t\t\t\t\t\t\t\t\t\t\tiMerc.vs2018\n");
     				printf("================================================================================================================================================================================================================================================\n"); 
     
@@ -605,9 +611,13 @@ void VerificarLogin()
             if( (!strcmp(fAux->cvLogin, cvAcessoLogin)) && (!strcmp(fAux->cvSenha,cvAcessoSenha))){
                 if(!strcmp(fAux->cvCargo, "ADMINISTRADOR")){
 	                iSenhaIgual = 1;
+	                strcpy(cvNFuncionario, fAux->cvNomeFunc);
+	                strcpy(cvCargoFunc, fAux->cvCargo);
 	                menu();
 				}else if(!strcmp(fAux->cvCargo, "CAIXA")){
 	                iSenhaIgual = 1;
+	                strcpy(cvNFuncionario, fAux->cvNomeFunc);
+	                strcpy(cvCargoFunc, fAux->cvCargo);
 	                menuCaixa();
 				}else{
 				iSenhaIgual = 1;
@@ -1491,7 +1501,11 @@ int cadastrarFuncionario(){
 
         printf("\nNome: ");
         strcpy(fNovoFuncionario->cvNomeFunc,Nome());
+        //passando nome para a variavel global
+        strcpy(cvNFuncionario, fNovoFuncionario->cvNomeFunc);
         strcpy(fNovoFuncionario->cvCargo, "ADMINISTRADOR");
+        //passando cargo para a variavel global
+        strcpy(cvCargoFunc, "ADMINISTRADOR");
 		CadastroLogin(fNovoFuncionario->cvLogin, fNovoFuncionario->cvSenha);
 
         if(fFuncionarioInicial == NULL) {
