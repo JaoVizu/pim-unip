@@ -145,16 +145,26 @@ int Nome();
 int gravarProduto();
 int gravarFuncionario();
 int gravarLogin();
+int gravarCliente();
+int gravarFornecedor();
+int gravarItemVenda();
+int gravarVenda();
 
 int lerProduto();
 int lerFuncionario();
 int lerLogin();
+int lerCliente();
+int lerFornecedor();
+int lerItemVenda();
+int lerVenda();
 
 int main(){
 	//ler dados dos arquivos
 	lerProduto();
 	lerFuncionario();
-
+	lerFornecedor();
+	lerCliente();
+	lerVenda();
 	VerificarLogin();
 	
     return 0;
@@ -183,6 +193,8 @@ void removidoSucesso(char cvNomeFuncao[], char cvNomeItem[]){
 
 void nullList(){
     printf("\nNao ha registros para serem listados!!!\n");
+    printf("\n\t\t\t\t   PRESSIONE QUALQUER TECLA PARA VOLTAR!");
+    
 }
 void notFound(char cvName[]){
 	printf("\n%s nao encontrado(a)!", cvName);
@@ -255,6 +267,9 @@ int menu()
         	//struct para arquivo
 			gravarProduto();
 			gravarFuncionario();
+			gravarFornecedor();
+			gravarCliente();
+			gravarVenda();
             VerificarLogin();
             break;
         case 1:
@@ -949,19 +964,32 @@ int Nome(){
 
 void listarProdutos(){
     tela("\tLISTA DE PRODUTOS");
-    printf("\n--------------------------------------------------------------------------------\n");
     if(pProdutoInicial == NULL){
          nullList();
     }else{
         Produto *pAux = pProdutoInicial;
         while(pAux != NULL){
-            printf("\nNome: %s |\tValidade: %s|\tValor: %.2f", pAux->cvNome, pAux->cvValidade,pAux->fValor);
-           printf("\nQuantidade Est.: %d |\tEst. Seguranca: %d |\tCodigo: %s |\tCodigo Fornecedor: %d", pAux->iQtdEstoque, pAux->iEstoqSeguranca,pAux->cvCodigo, pAux->iCodigoFornecedor);
-            printf("\n------------------------------------------------------------------------------\n");
-            printf("\n\t\t\   PRESSIONE QUALQUER TECLA PARA VOLTAR!");
+            printf("\nNome: %s                                     |\tValidade: %s       |\tValor: %.2f", pAux->cvNome, pAux->cvValidade,pAux->fValor);
+            printf("\n------------------------------------------------------------------------------------------------------------------------");
+           	printf("\nQuantidade Est.: %d                            |\tEst. Seguranca: %d", pAux->iQtdEstoque, pAux->iEstoqSeguranca);
+           	printf("\n------------------------------------------------------------------------------------------------------------------------");
+           	printf("\nCodigo: %s                                    |\tCodigo Fornecedor: %d", pAux->cvCodigo, pAux->iCodigoFornecedor);
+           	printf("\n------------------------------------------------------------------------------------------------------------------------");
+            printf("\n========================================================================================================================\n");
+            
             pAux = pAux->pProximo;
+            
+            /*printf("Nome: %s|\tCargo: %s", fAux->cvNomeFunc, fAux->cvCargo);
+            printf("\n------------------------------------------------------------------------------------------------------------------------");
+            printf("\nCPF: %s                                     |\tData de Nascimento: %s", fAux->cvCpf, fAux->cvData_nascimento);
+            printf("\n------------------------------------------------------------------------------------------------------------------------");
+            printf("\nCelular: %s                                 |\tTelefone: %s", fAux->cvCelular, fAux->cvTelefone);
+            printf("\n------------------------------------------------------------------------------------------------------------------------");
+            printf("\nEmail: %s|\tEndereco: %s", fAux->cvEmail, fAux->cvEndereco);
+            printf("\n========================================================================================================================\n");*/
         }
     }
+    printf("\n\t\t\   PRESSIONE QUALQUER TECLA PARA VOLTAR!");
     char cListar;
     cListar = getchar();
     getchar();
@@ -1409,14 +1437,14 @@ void alteraCliente()
 {
 	tela("\tALTERAR CLIENTE");
     Cliente *cAux = cClienteInicial;
-    char cvExNome[201];
+    char cvCpfCli[201];
     fflush(stdin);
-    editMessage("cliente");
-    strcpy(cvExNome,Nome());
+   printf("\nEntre com o CPF do cliente a ser alterado: ");
+    strcpy(cvCpfCli,FormatarCPF());
     int iNaoEncontrado = 0;
     while (cAux != NULL)
     {
-        if (!strcmp(cAux->cvNomeCli, cvExNome))
+        if (!strcmp(cAux->cvCpf, cvCpfCli))
         {
             fflush(stdin);
             printf("\nNome: ");
@@ -1454,16 +1482,17 @@ void removeCliente(){
         nullDelete();
     }else{
     	
-        char cvNomeP[201];
+        char cvCpfCli[201];
         char cvNomeTemp[200]; //Armazena o nome do item excluido temporariamente
         int iNaoEncontrado = 0;
         fflush(stdin);
-        printf("Entre com o nome do cliente que deseja remover: ");
-        fgets(cvNomeP, sizeof(cvNomeP), stdin);
-        cvNomeP[strcspn(cvNomeP, "\n")] = '\0';
+        printf("Entre com o CPF do cliente que deseja remover: ");
+        strcpy(cvCpfCli,FormatarCPF());
+        /*fgets(cvCpfCli, sizeof(cvCpfCli), stdin);
+        cvCpfCli[strcspn(cvCpfCli, "\n")] = '\0';*/
         
         while(cAux != NULL){
-        	if(!strcmp(cAux->cvNomeCli, cvNomeP)){
+        	if(!strcmp(cAux->cvCpf, cvCpfCli)){
         		if(cClienteInicial->cProximo == NULL) cClienteInicial = NULL;
         		strcpy(cvNomeTemp, cAux->cvNomeCli);
         		if(cAux == cClienteInicial){
@@ -1632,14 +1661,14 @@ void alteraFuncionario()
 	tela("\tALTERAR FUNCIONARIO");
     Funcionario *fAux = fFuncionarioInicial;
     int iOp;
-    char cvExNome[201];
+    char cvCpfFunc[201];
     fflush(stdin);
-    editMessage("funcionario");
-    strcpy(cvExNome,Nome());
+    printf("\nEntre com o CPF do funcionario a ser alterado: ");
+    strcpy(cvCpfFunc,FormatarCPF());
     int iNaoEncontrado = 0;
     while (fAux != NULL)
     {
-        if (!strcmp(fAux->cvNomeFunc, cvExNome))
+        if (!strcmp(fAux->cvCpf, cvCpfFunc))
         {
             fflush(stdin);
             printf("\nNome funcionario: ");
@@ -1705,17 +1734,18 @@ void removeFuncionario()
     }
     else
     {
-        char cvNomeP[201];
+        char cvCpfFunc[201];
         char cvNomeTemp[200]; // Armazena o nome do item excluido temporariamente
         int iNaoEncontrado = 0;
         fflush(stdin);
-        printf("Entre com o nome do funcionario que deseja remover: ");
-        fgets(cvNomeP, sizeof(cvNomeP), stdin);
-        cvNomeP[strcspn(cvNomeP, "\n")] = '\0';
+        printf("Entre com o CPF do funcionario que deseja remover: ");
+        strcpy(cvCpfFunc,FormatarCPF());
+        /*fgets(cvNomeP, sizeof(cvNomeP), stdin);
+        cvNomeP[strcspn(cvNomeP, "\n")] = '\0';*/
 
         while (fAux != NULL)
         {
-            if (!strcmp(fAux->cvNomeFunc, cvNomeP))
+            if (!strcmp(fAux->cvCpf, cvCpfFunc))
             {
                 if (fFuncionarioInicial->funProximo == NULL){ //nao pode ser removido pois eh a chave para o sistema
 					printf("\n\t\t\tESTE FUNCIONARIO NAO PODE SER REMOVIDO\n");
@@ -1751,14 +1781,15 @@ void removeFuncionario()
 
 int venda(){
 	
-	char cFinalizar;
+	int iFinalizar;
 	char cJaCliente;
-	char cvNomeCliente[201];
+	char cvCpfCliente[201];
 	char cvCodProduto[51];
 	int iVerificaCli;
 	int iFormaPag;
 	int iNaoEncontrado = 0;
 	int iQuantidade = 0;
+	int iCancelaVenda;
 	float fDinheiroRecebido = 0;
 	float totalItem = 0;
 	float totalVenda = 0;
@@ -1767,13 +1798,12 @@ int venda(){
 	printf("\t\t\t***** DESCONTO PARA CLIENTES ******\n\n");
 	printf("Ja eh cliente? (s/n)");
 	scanf(" %c", &cJaCliente);
-	
 	if(cJaCliente == 's'){
 		fflush(stdin);	
-		printf("Entre com o nome do cliente: ");	
-		fgets(cvNomeCliente, sizeof(cvNomeCliente), stdin);
-		cvNomeCliente[strcspn(cvNomeCliente, "\n")] = '\0';
-		iVerificaCli = verificaCliente(cvNomeCliente);
+		printf("Entre com o CPF do cliente: ");	
+		fgets(cvCpfCliente, sizeof(cvCpfCliente), stdin);
+		cvCpfCliente[strcspn(cvCpfCliente, "\n")] = '\0';
+		iVerificaCli = verificaCliente(cvCpfCliente);
 		if(iVerificaCli){
 			printf("Cliente cadastrado no sistema!! Os descontos serao aplicados!\n");
 		}else{
@@ -1838,10 +1868,11 @@ int venda(){
 				pAux = pAux->pProximo;
 			}//fim while produto
 			printf("Total Produto: R$ %.2f\n", iNovoItem->fValorItem);
-			printf("Finalizar items? (s)");
-			scanf(" %c", &cFinalizar);
+			
+			printf("Finalizar items? (1)");
+			scanf("%d", &iFinalizar);
 			system("cls || clear");
-		}while(cFinalizar != 's');
+		}while(iFinalizar != 1);
 		
 		//colocar na struct de venda
 		srand(time(NULL));
@@ -1900,9 +1931,22 @@ int venda(){
 			
 		}
 		
-		printf("Finalizar venda? (s)\n");
-		scanf(" %c", &cFinalizar);	
-	}while(cFinalizar != 's');
+		printf("Finalizar venda? (1) | Cancelar Venda (0)\n");
+		scanf("%d", &iFinalizar);	
+		if(iFinalizar == 0){
+			printf("\t\t\t DESEJA REALMENTE CANCELAR A VENDA? (1) - SIM / (0) - NAO\n");
+			printf("%d", &iCancelaVenda);
+			switch(iCancelaVenda){
+				case 0: iFinalizar = -1; break;
+				case 1: 
+					free(vVendaInicial);
+					vVendaInicial = NULL;
+					return 0;
+					break;
+			}	
+		}
+		
+	}while(iFinalizar != 1);
 	//limpar item venda
 	iItemVendaInicial = NULL;
 	return 0;	
@@ -1949,12 +1993,12 @@ void listaItemVenda(){
 	printf("\t\t\t************************************************************\n");
 }
 
-int verificaCliente(char cvNome[]){
+int verificaCliente(char cvCpfCli[]){
 	
 	int iNaoEncontrado = 0;
 	Cliente *cAux = cClienteInicial;
 	while(cAux != NULL){
-		if(!strcmp(cAux->cvNomeCli, cvNome)){
+		if(!strcmp(cAux->cvCpf, cvCpfCli)){
 			iNaoEncontrado++;
 		}
 		cAux = cAux->cProximo;
@@ -2011,6 +2055,68 @@ int gravarLogin(){
 	fwrite(iHaveLogin, sizeof(int), 1,arq);
 	fclose(arq);
 }
+
+int gravarCliente(){
+	printf("Entrou aqui\n");
+	FILE *arq;
+	arq = fopen("cliente.dat", "wb");
+	if(arq == NULL){
+		printf("\nProblemas na criacao do arquivo");
+		return 1;
+	}
+	Cliente *fAux = cClienteInicial;
+	while(fAux != NULL){
+        fwrite(fAux, sizeof(Cliente), 1,arq);
+        fAux = fAux->cProximo;
+	}
+	fclose(arq);
+}
+
+int gravarItemVenda(){
+	FILE *arq;
+	arq = fopen("item_venda.dat", "wb");
+	if(arq == NULL){
+		printf("\nProblemas na criacao do arquivo");
+		return 1;
+	}
+    ItemVenda *fAux = iItemVendaInicial;
+	while(fAux != NULL){
+        fwrite(fAux, sizeof(ItemVenda), 1,arq);
+        fAux = fAux->iItemProximo;
+	}
+	fclose(arq);
+}
+
+int gravarVenda(){
+	FILE *arq;
+	arq = fopen("venda.dat", "wb");
+	if(arq == NULL){
+		printf("\nProblemas na criacao do arquivo");
+		return 1;
+	}
+    Venda *fAux = vVendaInicial;
+	while(fAux != NULL){
+        fwrite(fAux, sizeof(Venda), 1,arq);
+        fAux = fAux->vendaProximo;
+	}
+    fclose(arq);
+}
+
+int gravarFornecedor(){
+	FILE *arq;
+	arq = fopen("fornecedor.dat", "wb");
+	if(arq == NULL){
+		printf("\nProblemas na criacao do arquivo");
+		return 1;
+	}
+	Fornecedor *fAux = fFornecedorInicial;
+	while(fAux != NULL){
+        fwrite(fAux, sizeof(Fornecedor), 1,arq);
+        fAux = fAux->fProximo;
+	}
+	fclose(arq);
+}
+
 
 /******* LER ARQUIVOS *******/
 int lerProduto(){
@@ -2087,4 +2193,110 @@ int lerLogin(){
 		}
 	}
 	fclose(arq);
+}
+
+int lerCliente(){
+	Cliente cCliente;
+	FILE *arq;
+	arq = fopen("cliente.dat", "rb");
+	if(arq == NULL){
+		printf("Problemas na abertura do arquivo\n");
+		return 1;
+	}
+	while(!feof(arq)){
+		int lido = fread(&cCliente, sizeof(Cliente),1,arq);
+		if(lido == 1){
+			printf("Chegou aqui\n");
+			Cliente *pAux = (Cliente*) malloc(sizeof(Cliente));
+			strcpy(pAux->cvNomeCli, cCliente.cvNomeCli);
+			strcpy(pAux->cvData_nascimento, cCliente.cvData_nascimento);
+			strcpy(pAux->cvEmail, cCliente.cvEmail);
+			strcpy(pAux->cvTelefone, cCliente.cvTelefone);
+			strcpy(pAux->cvCelular, cCliente.cvCelular);
+			strcpy(pAux->cvEndereco, cCliente.cvEndereco);
+			pAux->cProximo = cClienteInicial;
+			cClienteInicial = pAux;
+		}
+	}
+	fclose(arq);
+
+}
+
+int lerFornecedor(){
+	Fornecedor fFornecedor;
+	FILE *arq;
+	arq = fopen("fornecedor.dat", "rb");
+	if(arq == NULL){
+		printf("Problemas na criacao do arquivo\n");
+		return 1;
+	}
+	while(!feof(arq)){
+		int lido = fread(&fFornecedor, sizeof(Fornecedor),1,arq);
+		if(lido == 1){
+			printf("Chegou aqui\n");
+			Fornecedor *pAux = (Fornecedor*) malloc(sizeof(Fornecedor));
+			strcpy(pAux->cvNome, fFornecedor.cvNome);
+			strcpy(pAux->cvNomeFantasia, fFornecedor.cvNomeFantasia);
+			strcpy(pAux->cvEndereco, fFornecedor.cvEndereco);
+			strcpy(pAux->cvCnpj, fFornecedor.cvCnpj);
+			strcpy(pAux->cvEmail, fFornecedor.cvEmail);
+			strcpy(pAux->cvTelefone, fFornecedor.cvTelefone);
+			strcpy(pAux->cvCelular, fFornecedor.cvCelular);
+			pAux->iCodigoProduto = fFornecedor.iCodigoProduto;
+			pAux->fProximo = fFornecedorInicial;
+            fFornecedorInicial= pAux;
+		}
+	}
+	fclose(arq);
+
+}
+
+
+int lerItemVenda(){
+	ItemVenda iItemVenda;
+	FILE *arq;
+	arq = fopen("item_venda.dat", "rb");
+	if(arq == NULL){
+		printf("Problemas na criacao do arquivo\n");
+		return 1;
+	}
+	while(!feof(arq)){
+		int lido = fread(&iItemVenda, sizeof(ItemVenda),1,arq);
+		if(lido == 1){
+			printf("Chegou aqui\n");
+			ItemVenda *pAux = (ItemVenda*) malloc(sizeof(ItemVenda));
+			strcpy(pAux->cvNomeItem, iItemVenda.cvNomeItem);
+			pAux->fValorItem = iItemVenda.fValorItem;
+			pAux->iItemProximo = iItemVendaInicial;
+			iItemVendaInicial = pAux;
+		}
+	}
+	fclose(arq);
+
+}
+
+int lerVenda(){
+	Venda vVenda;
+	FILE *arq;
+	arq = fopen("venda.dat", "rb");
+	if(arq == NULL){
+		printf("Problemas na criacao do arquivo\n");
+		return 1;
+	}
+	while(!feof(arq)){
+		int lido = fread(&vVenda, sizeof(Venda),1,arq);
+		if(lido == 1){
+			printf("Chegou aqui\n");
+			Venda *pAux = (Venda*) malloc(sizeof(Venda));
+			pAux->iDia = vVenda.iDia;
+			pAux->iMes = vVenda.iMes;
+			pAux->iAno = vVenda.iAno;
+			pAux->iCodVenda = vVenda.iCodVenda;
+			pAux->dTotalCompra = vVenda.dTotalCompra;
+			pAux->vendaProximo = vVendaInicial;
+			vVendaInicial = pAux;
+		}
+	}
+	fclose(arq);
+
 }
